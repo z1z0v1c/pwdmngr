@@ -1,0 +1,16 @@
+CREATE DATABASE pwdmngr;
+
+CREATE TABLE users(
+	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	first_name TEXT NOT NULL,
+	last_name TEXT NOT NULL,
+	username TEXT NOT NULL,
+	password TEXT NOT NULL
+);
+
+CREATE TABLE login_data(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	site TEXT NOT NULL,
+	username TEXT NOT NULL,
+	password TEXT NOT NULL
+);
