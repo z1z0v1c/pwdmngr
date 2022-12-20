@@ -59,3 +59,6 @@ dkms.conf
 
 # VS Code files
 .vscode/
+
+# Ignore SQLite database file
+*.db
