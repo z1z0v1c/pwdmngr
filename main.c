@@ -4,7 +4,8 @@
 #include <string.h>
 
 int choose_option(void);
-int register_user();
+int login(sqlite3 *db);
+int register_user(sqlite3 *db);
 
 int main(void)
 {
@@ -22,7 +23,11 @@ int main(void)
     // Ask user to choose the option
     int option = choose_option();
 
-    if (option == 2)
+    if (option == 1)
+    {
+        login(db);
+    }
+    else
     {
         register_user(db);
     }
@@ -49,6 +54,55 @@ int choose_option(void)
     }
 
     return option;
+}
+
+int login(sqlite3 *db)
+{
+    char username[30];
+    char password[30];
+
+    // Prompt the user for the username, and password
+    printf("Username: ");
+    fgets(username, sizeof(username), stdin);
+    username[strlen(username) - 1] = '\0';
+
+    printf("Password: ");
+    fgets(password, sizeof(password), stdin);
+    password[strlen(password) - 1] = '\0';
+
+    // Validate input
+    if (strlen(username) == 0 || strlen(password) == 0)
+    {
+        fprintf(stderr, "Error: All fields are required\n");
+        return -1;
+    }
+
+    char *err_msg = 0;
+    sqlite3_stmt *res;
+    int rc = sqlite3_prepare_v2(db, "SELECT password FROM users WHERE username = ?", -1, &res, 0);
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_text(res, 1, username, -1, NULL);
+    }
+    else
+    {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    }
+
+    int step = sqlite3_step(res);
+    const char *text = sqlite3_column_text(res, 0);
+
+    if (step != SQLITE_ROW || strcmp(text, password) != 0)
+    {
+        printf("\nUsername or password are incorrect\n");
+        sqlite3_finalize(res);
+        return 0;
+    }
+
+    printf("\nLogin successfull\n");
+    sqlite3_finalize(res);
+    return 0;
 }
 
 int register_user(sqlite3 *db)
@@ -100,6 +154,7 @@ int register_user(sqlite3 *db)
         return -1;
     }
 
+    printf("\nRegister successfull\n");
     sqlite3_free(insert_query);
     return 0;
 }
