@@ -3,7 +3,8 @@
 #include <sqlite3.h>
 #include <string.h>
 
-int choose_option(void);
+int choose_login_register_option(void);
+int choose_site_data_option(void);
 int login(sqlite3 *db);
 int register_user(sqlite3 *db);
 
@@ -20,8 +21,10 @@ int main(void)
         return (0);
     }
 
+    printf("Choose options by specifying a number\n");
+
     // Ask user to choose the option
-    int option = choose_option();
+    int option = choose_login_register_option();
 
     if (option == 1)
     {
@@ -32,19 +35,45 @@ int main(void)
         register_user(db);
     }
 
+    // Ask user to choose the option
+    int next_option = choose_site_data_option();
+
     sqlite3_close(db);
     return 0;
 }
 
-int choose_option(void)
+int choose_login_register_option(void)
 {
     int option = 0;
 
     while (option != 1 && option != 2)
     {
-        printf("1. Login \n");
+        printf("\n1. Login \n");
         printf("2. Register \n");
-        printf("Choose an option (1/2): ");
+        printf("\nChoose an option: ");
+
+        scanf("%d", &option);
+
+        // Flush the buffer
+        char line[100];
+        fgets(line, sizeof(line), stdin);
+    }
+
+    return option;
+}
+
+int choose_site_data_option(void)
+{
+    int option = 0;
+
+    while (option != 1 && option != 2 && option != 3 && option != 4 && option != 5)
+    {
+        printf("\n1. Generate password \n");
+        printf("2. Add account\n");
+        printf("3. Edit account\n");
+        printf("4. Delete account\n");
+        printf("5. List all accounts\n");
+        printf("\nChoose an option : ");
 
         scanf("%d", &option);
 
@@ -62,11 +91,11 @@ int login(sqlite3 *db)
     char password[30];
 
     // Prompt the user for the username, and password
-    printf("Username: ");
+    printf("\n\tUsername: ");
     fgets(username, sizeof(username), stdin);
     username[strlen(username) - 1] = '\0';
 
-    printf("Password: ");
+    printf("\tMaster password: ");
     fgets(password, sizeof(password), stdin);
     password[strlen(password) - 1] = '\0';
 
@@ -125,7 +154,7 @@ int register_user(sqlite3 *db)
     fgets(username, sizeof(username), stdin);
     username[strlen(username) - 1] = '\0';
 
-    printf("Password: ");
+    printf("Master password: ");
     fgets(password, sizeof(password), stdin);
     password[strlen(password) - 1] = '\0';
 

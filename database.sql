@@ -8,7 +8,7 @@ CREATE TABLE users(
 	password TEXT NOT NULL
 );
 
-CREATE TABLE login_data(
+CREATE TABLE accounts(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	site TEXT NOT NULL,
 	username TEXT NOT NULL,
