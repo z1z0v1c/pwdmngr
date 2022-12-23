@@ -10,7 +10,9 @@ CREATE TABLE users(
 
 CREATE TABLE accounts(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER NOT NULL,
 	site TEXT NOT NULL,
 	username TEXT NOT NULL,
-	password TEXT NOT NULL
+	password TEXT NOT NULL,
+	FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
