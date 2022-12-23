@@ -108,7 +108,7 @@ int login(sqlite3 *db)
 
     char *err_msg = 0;
     sqlite3_stmt *res;
-    int rc = sqlite3_prepare_v2(db, "SELECT password FROM users WHERE username = ?", -1, &res, 0);
+    int rc = sqlite3_prepare_v2(db, "SELECT user_id, password FROM users WHERE username = ?", -1, &res, 0);
 
     if (rc == SQLITE_OK)
     {
@@ -120,7 +120,8 @@ int login(sqlite3 *db)
     }
 
     int step = sqlite3_step(res);
-    const char *text = sqlite3_column_text(res, 0);
+    const int user_id = sqlite3_column_int(res, 0);
+    const char *text = sqlite3_column_text(res, 1);
 
     if (step != SQLITE_ROW || strcmp(text, password) != 0)
     {
@@ -128,6 +129,13 @@ int login(sqlite3 *db)
         sqlite3_finalize(res);
         return 0;
     }
+
+    // Convert the integer to a string and store the result in the str buffer
+    char str[3];
+    sprintf(str, "%d", user_id);
+
+    // Track session
+    setenv("SESSION_ID", str, 1);
 
     printf("\nLogin successfull\n");
     sqlite3_finalize(res);
