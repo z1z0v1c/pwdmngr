@@ -7,6 +7,7 @@ int choose_login_register_option(void);
 int choose_site_data_option(void);
 int login(sqlite3 *db);
 int register_user(sqlite3 *db);
+int add_data(sqlite3 *db);
 
 int main(void)
 {
@@ -36,7 +37,17 @@ int main(void)
     }
 
     // Ask user to choose the option
-    int next_option = choose_site_data_option();
+    option = choose_site_data_option();
+
+    switch (option)
+    {
+    case 2:
+        add_data(db);
+        break;
+
+    default:
+        break;
+    }
 
     sqlite3_close(db);
     return 0;
@@ -192,6 +203,54 @@ int register_user(sqlite3 *db)
     }
 
     printf("\nRegister successfull\n");
+    sqlite3_free(insert_query);
+    return 0;
+}
+
+int add_data(sqlite3 *db)
+{
+    printf("\n\tSite: ");
+    char site[100];
+    fgets(site, sizeof(site), stdin);
+    site[strcspn(site, "\n")] = 0;
+
+    printf("\tUsername: ");
+    char username[100];
+    fgets(username, sizeof(username), stdin);
+    site[strcspn(username, "\n")] = 0;
+
+    printf("\tPassword: ");
+    char password[100];
+    fgets(password, sizeof(password), stdin);
+    password[strcspn(password, "\n")] = 0;
+
+    // Validate input
+    if (strlen(site) == 0 || strlen(username) == 0 || strlen(password) == 0)
+    {
+        fprintf(stderr, "Error: All fields are required\n");
+        return -1;
+    }
+
+    char *user_id = getenv("SESSION_ID");
+
+    // Construct the INSERT statement
+    char *insert_query = sqlite3_mprintf(
+        "INSERT INTO accounts (user_id, site, username, password) "
+        "VALUES ('%d', '%q', '%q', '%q');",
+        atoi(user_id), site, username, password);
+
+    // Execute the INSERT statement
+    char *zErrMsg = 0;
+    int rc = sqlite3_exec(db, insert_query, 0, 0, &zErrMsg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        sqlite3_free(insert_query);
+        return -1;
+    }
+
+    printf("\nSuccessfull\n");
     sqlite3_free(insert_query);
     return 0;
 }
