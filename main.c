@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <string.h>
+#include "database.h"
 
 int choose_login_register_option(void);
 int choose_site_data_option(void);
+
 int login(sqlite3 *db);
 int register_user(sqlite3 *db);
-int add_data(sqlite3 *db);
+int add_account_data(sqlite3 *db);
 
 int main(void)
 {
@@ -42,7 +44,7 @@ int main(void)
     switch (option)
     {
     case 2:
-        add_data(db);
+        add_account_data(db);
         break;
 
     default:
@@ -117,39 +119,24 @@ int login(sqlite3 *db)
         return -1;
     }
 
-    char *err_msg = 0;
-    sqlite3_stmt *res;
-    int rc = sqlite3_prepare_v2(db, "SELECT user_id, password FROM users WHERE username = ?", -1, &res, 0);
+    char *db_password = get_users_password(db, username);
 
-    if (rc == SQLITE_OK)
+    if (strcmp(db_password, password) != 0)
     {
-        sqlite3_bind_text(res, 1, username, -1, NULL);
-    }
-    else
-    {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-    }
-
-    int step = sqlite3_step(res);
-    const int user_id = sqlite3_column_int(res, 0);
-    const char *text = sqlite3_column_text(res, 1);
-
-    if (step != SQLITE_ROW || strcmp(text, password) != 0)
-    {
-        printf("\nUsername or password are incorrect\n");
-        sqlite3_finalize(res);
+        printf("\nPassword are incorrect\n");
         return 0;
     }
 
+    const int user_id = get_users_id(db, username);
+
     // Convert the integer to a string and store the result in the str buffer
-    char str[3];
-    sprintf(str, "%d", user_id);
+    char user[3];
+    sprintf(user, "%d", user_id);
 
     // Track session
-    setenv("SESSION_ID", str, 1);
+    setenv("SESSION_ID", user, 1);
 
     printf("\nLogin successfull\n");
-    sqlite3_finalize(res);
     return 0;
 }
 
@@ -185,29 +172,14 @@ int register_user(sqlite3 *db)
         return -1;
     }
 
-    // Construct the INSERT statement
-    char *insert_query = sqlite3_mprintf(
-        "INSERT INTO users (first_name, last_name, username, password) "
-        "VALUES ('%q', '%q', '%q', '%q');",
-        first_name, last_name, username, password);
-
-    // Execute the INSERT statement
-    char *zErrMsg = 0;
-    int rc = sqlite3_exec(db, insert_query, 0, 0, &zErrMsg);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-        sqlite3_free(insert_query);
-        return -1;
-    }
+    save_user(db, first_name, last_name, username, password);
 
     printf("\nRegister successfull\n");
-    sqlite3_free(insert_query);
+    
     return 0;
 }
 
-int add_data(sqlite3 *db)
+int add_account_data(sqlite3 *db)
 {
     printf("\n\tSite: ");
     char site[100];
@@ -231,26 +203,10 @@ int add_data(sqlite3 *db)
         return -1;
     }
 
-    char *user_id = getenv("SESSION_ID");
+    const char *user_id = getenv("SESSION_ID");
 
-    // Construct the INSERT statement
-    char *insert_query = sqlite3_mprintf(
-        "INSERT INTO accounts (user_id, site, username, password) "
-        "VALUES ('%d', '%q', '%q', '%q');",
-        atoi(user_id), site, username, password);
-
-    // Execute the INSERT statement
-    char *zErrMsg = 0;
-    int rc = sqlite3_exec(db, insert_query, 0, 0, &zErrMsg);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-        sqlite3_free(insert_query);
-        return -1;
-    }
+    save_account(db, user_id, site, username, password);
 
     printf("\nSuccessfull\n");
-    sqlite3_free(insert_query);
     return 0;
 }
