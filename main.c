@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 #include <string.h>
 #include "database.h"
+#include "helper.h"
 
 int choose_login_register_option(void);
 int choose_site_data_option(void);
@@ -29,13 +30,16 @@ int main(void)
     // Ask user to choose the option
     int option = choose_login_register_option();
 
-    if (option == 1)
+    switch (option)
     {
-        login(db);
-    }
-    else
-    {
+    case 2:
         register_user(db);
+    case 1:
+        login(db);
+        break;
+
+    default:
+        break;
     }
 
     // Ask user to choose the option
@@ -100,17 +104,8 @@ int choose_site_data_option(void)
 
 int login(sqlite3 *db)
 {
-    char username[30];
-    char password[30];
-
-    // Prompt the user for the username, and password
-    printf("\n\tUsername: ");
-    fgets(username, sizeof(username), stdin);
-    username[strlen(username) - 1] = '\0';
-
-    printf("\tMaster password: ");
-    fgets(password, sizeof(password), stdin);
-    password[strlen(password) - 1] = '\0';
+    char* username = get_string("\n\tUsername: ", 30);
+    char* password = get_string("\tMaster password: ", 30);
 
     // Validate input
     if (strlen(username) == 0 || strlen(password) == 0)
@@ -119,8 +114,10 @@ int login(sqlite3 *db)
         return -1;
     }
 
+    // Get password for the user from database
     char *db_password = get_users_password(db, username);
 
+    // Compare passwords
     if (strcmp(db_password, password) != 0)
     {
         printf("\nPassword are incorrect\n");
@@ -137,32 +134,17 @@ int login(sqlite3 *db)
     setenv("SESSION_ID", user, 1);
 
     printf("\nLogin successfull\n");
+
+    free_all(3, username, password, db_password);
     return 0;
 }
 
 int register_user(sqlite3 *db)
 {
-    char first_name[30];
-    char last_name[30];
-    char username[30];
-    char password[30];
-
-    // Prompt the user for their first name, last name, username, and password
-    printf("\nFirst name: ");
-    fgets(first_name, sizeof(first_name), stdin);
-    first_name[strlen(first_name) - 1] = '\0';
-
-    printf("Last name: ");
-    fgets(last_name, sizeof(last_name), stdin);
-    last_name[strlen(last_name) - 1] = '\0';
-
-    printf("Username: ");
-    fgets(username, sizeof(username), stdin);
-    username[strlen(username) - 1] = '\0';
-
-    printf("Master password: ");
-    fgets(password, sizeof(password), stdin);
-    password[strlen(password) - 1] = '\0';
+    char* first_name = get_string("\nFirst name: ", 30);
+    char* last_name = get_string("Last name: ", 30);
+    char* username = get_string("Username: ", 30);
+    char* password = get_string("Master password: ", 30);
 
     // Validate input
     if (strlen(first_name) == 0 || strlen(last_name) == 0 ||
@@ -176,25 +158,15 @@ int register_user(sqlite3 *db)
 
     printf("\nRegister successfull\n");
     
+    free_all(4, first_name, last_name, username, password);
     return 0;
 }
 
 int add_account_data(sqlite3 *db)
 {
-    printf("\n\tSite: ");
-    char site[100];
-    fgets(site, sizeof(site), stdin);
-    site[strcspn(site, "\n")] = 0;
-
-    printf("\tUsername: ");
-    char username[100];
-    fgets(username, sizeof(username), stdin);
-    site[strcspn(username, "\n")] = 0;
-
-    printf("\tPassword: ");
-    char password[100];
-    fgets(password, sizeof(password), stdin);
-    password[strcspn(password, "\n")] = 0;
+    char* site = get_string("\n\tSite: ", 30);
+    char* username = get_string("\tUsername: ", 30);
+    char* password = get_string("\tpassword: ", 30);
 
     // Validate input
     if (strlen(site) == 0 || strlen(username) == 0 || strlen(password) == 0)
@@ -203,10 +175,12 @@ int add_account_data(sqlite3 *db)
         return -1;
     }
 
-    const char *user_id = getenv("SESSION_ID");
+    int user_id = atoi(getenv("SESSION_ID"));
 
     save_account(db, user_id, site, username, password);
 
     printf("\nSuccessfull\n");
+
+    free_all(3, site, username, password);
     return 0;
 }

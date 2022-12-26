@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "database.h"
 
 char *get_users_password(sqlite3 *db, char *username)
 {
     sqlite3_stmt *res;
-    int rc = sqlite3_prepare_v2(db, "SELECT user_id, password FROM users WHERE username = ?", -1, &res, 0);
+    int rc = sqlite3_prepare_v2(db, "SELECT password FROM users WHERE username = ?", -1, &res, 0);
 
     if (rc == SQLITE_OK)
     {
@@ -21,13 +23,19 @@ char *get_users_password(sqlite3 *db, char *username)
     {
         printf("\nUsername are incorrect\n");
         sqlite3_finalize(res);
-        return "wrong password";
+        char *password = "wrong password";
+        return password;
     }
 
     char *password = (char*)sqlite3_column_text(res, 0);
+    int password_length = strlen(password);
+
+    char *result = (char*)malloc(password_length + 1);
+    strncpy(result, password, password_length);
+    result[password_length] = '\0';
 
     sqlite3_finalize(res);
-    return password;
+    return result;
 }
 
 int get_users_id(sqlite3 *db, char *username)
