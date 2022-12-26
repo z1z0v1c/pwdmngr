@@ -42,17 +42,29 @@ int main(void)
         break;
     }
 
-    // Ask user to choose the option
-    option = choose_site_data_option();
-
-    switch (option)
+    while (1)
     {
-    case 2:
-        add_account_data(db);
-        break;
+        // Ask user to choose the option
+        option = choose_site_data_option();
 
-    default:
-        break;
+        switch (option)
+        {
+        case 2:
+            add_account_data(db);
+            break;
+
+        default:
+            break;
+        }
+
+        char should_continue[3];
+        printf("\nDo you want to continue (y/n): ");
+        scanf("%s", should_continue);
+
+        if (strcmp("y", should_continue) != 0 && strcmp("yes", should_continue) != 0)
+        {
+            break;
+        }
     }
 
     sqlite3_close(db);
@@ -104,8 +116,8 @@ int choose_site_data_option(void)
 
 int login(sqlite3 *db)
 {
-    char* username = get_string("\n\tUsername: ", 30);
-    char* password = get_string("\tMaster password: ", 30);
+    char *username = get_string("\n\tUsername: ", 30);
+    char *password = get_string("\tMaster password: ", 30);
 
     // Validate input
     if (strlen(username) == 0 || strlen(password) == 0)
@@ -141,10 +153,10 @@ int login(sqlite3 *db)
 
 int register_user(sqlite3 *db)
 {
-    char* first_name = get_string("\nFirst name: ", 30);
-    char* last_name = get_string("Last name: ", 30);
-    char* username = get_string("Username: ", 30);
-    char* password = get_string("Master password: ", 30);
+    char *first_name = get_string("\nFirst name: ", 30);
+    char *last_name = get_string("Last name: ", 30);
+    char *username = get_string("Username: ", 30);
+    char *password = get_string("Master password: ", 30);
 
     // Validate input
     if (strlen(first_name) == 0 || strlen(last_name) == 0 ||
@@ -157,16 +169,16 @@ int register_user(sqlite3 *db)
     save_user(db, first_name, last_name, username, password);
 
     printf("\nRegister successfull\n");
-    
+
     free_all(4, first_name, last_name, username, password);
     return 0;
 }
 
 int add_account_data(sqlite3 *db)
 {
-    char* site = get_string("\n\tSite: ", 30);
-    char* username = get_string("\tUsername: ", 30);
-    char* password = get_string("\tpassword: ", 30);
+    char *site = get_string("\n\tSite: ", 30);
+    char *username = get_string("\tUsername: ", 30);
+    char *password = get_string("\tpassword: ", 30);
 
     // Validate input
     if (strlen(site) == 0 || strlen(username) == 0 || strlen(password) == 0)
