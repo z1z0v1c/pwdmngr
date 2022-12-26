@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "application.h"
 #include "helper.h"
 
 void free_all(int count, ...)
@@ -23,6 +24,23 @@ void free_all(int count, ...)
 
     // clean up the variable argument list
     va_end(args);
+}
+
+void free_user(User *user)
+{
+    free(user->first_name);
+    free(user->last_name);
+    free(user->username);
+    free(user->password);
+    free(user);
+}
+
+void free_account(Account *account)
+{
+    free(account->site);
+    free(account->username);
+    free(account->password);
+    free(account);
 }
 
 char *get_string(char *tip, int len)

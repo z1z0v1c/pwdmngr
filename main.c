@@ -6,13 +6,6 @@
 #include "database.h"
 #include "helper.h"
 
-int choose_login_register_option(void);
-int choose_site_data_option(void);
-
-int login(sqlite3 *db);
-int register_user(sqlite3 *db);
-int add_account_data(sqlite3 *db);
-
 int main(void)
 {
     // Open database
@@ -52,6 +45,9 @@ int main(void)
         {
         case 2:
             add_account_data(db);
+            break;
+        case 5:
+            list_all_accounts(db);
             break;
 
         default:

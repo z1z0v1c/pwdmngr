@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <string.h>
+#include "application.h"
 #include "database.h"
 #include "helper.h"
 
@@ -87,47 +88,55 @@ int login(sqlite3 *db)
 
 int register_user(sqlite3 *db)
 {
-    char *first_name = get_string("\nFirst name: ", 30);
-    char *last_name = get_string("Last name: ", 30);
-    char *username = get_string("Username: ", 30);
-    char *password = get_string("Master password: ", 30);
+    User *user =(User *)malloc(sizeof(User));
+    user->first_name = get_string("\nFirst name: ", 30);
+    user->last_name = get_string("Last name: ", 30);
+    user->username = get_string("Username: ", 30);
+    user->password = get_string("Master password: ", 30);
 
-    // Validate input
-    if (strlen(first_name) == 0 || strlen(last_name) == 0 ||
-        strlen(username) == 0 || strlen(password) == 0)
+    // Validate user
+    if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
+        strlen(user->username) == 0 || strlen(user->password) == 0)
     {
         fprintf(stderr, "Error: All fields are required\n");
         return -1;
     }
 
-    save_user(db, first_name, last_name, username, password);
+    // Save user to db
+    save_user(db, user);
 
     printf("\nRegister successfull\n");
 
-    free_all(4, first_name, last_name, username, password);
+    // Free user
+    free_user(user);
     return 0;
 }
 
 int add_account_data(sqlite3 *db)
 {
-    char *site = get_string("\n\tSite: ", 30);
-    char *username = get_string("\tUsername: ", 30);
-    char *password = get_string("\tpassword: ", 30);
+    Account *account = (Account *)malloc(sizeof(Account));
+    account->site = get_string("\n\tSite: ", 30);
+    account->username = get_string("\tUsername: ", 30);
+    account->password = get_string("\tpassword: ", 30);
 
     // Validate input
-    if (strlen(site) == 0 || strlen(username) == 0 || strlen(password) == 0)
+    if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(account->password) == 0)
     {
         fprintf(stderr, "Error: All fields are required\n");
         return -1;
     }
 
-    int user_id = atoi(getenv("SESSION_ID"));
+    account->user_id = atoi(getenv("SESSION_ID"));
 
-    save_account(db, user_id, site, username, password);
+    save_account(db, account);
 
     printf("\nSuccessfull\n");
 
-    free_all(3, site, username, password);
+    free_account(account);
     return 0;
 }
 
+int list_all_accounts(sqlite3 *db)
+{
+    return 0;
+}

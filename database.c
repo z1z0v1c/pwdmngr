@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "application.h"
 #include "database.h"
 
 char *get_users_password(sqlite3 *db, char *username)
@@ -67,13 +68,13 @@ int get_users_id(sqlite3 *db, char *username)
     return user_id;
 }
 
-int save_account(sqlite3 *db, int user_id, char *site, char *username, char *password)
+int save_account(sqlite3 *db, Account *account)
 {
     // Construct the INSERT statement
     char *insert_query = sqlite3_mprintf(
         "INSERT INTO accounts (user_id, site, username, password) "
         "VALUES ('%d', '%q', '%q', '%q');",
-        user_id, site, username, password);
+        account->user_id, account->site, account->username, account->password);
 
     // Execute the INSERT statement
     char *zErrMsg = 0;
@@ -92,13 +93,13 @@ int save_account(sqlite3 *db, int user_id, char *site, char *username, char *pas
     return 0;
 }
 
-int save_user(sqlite3 *db, char *first_name, char *last_name, char *username, char *password)
+int save_user(sqlite3 *db, User *user)
 {
     // Construct the INSERT statement
     char *insert_query = sqlite3_mprintf(
         "INSERT INTO users (first_name, last_name, username, password) "
         "VALUES ('%q', '%q', '%q', '%q');",
-        first_name, last_name, username, password);
+        user->first_name, user->last_name, user->username, user->password);
 
     // Execute the INSERT statement
     char *zErrMsg = 0;
