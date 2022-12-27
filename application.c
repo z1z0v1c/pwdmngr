@@ -6,6 +6,8 @@
 #include "database.h"
 #include "helper.h"
 
+#define MAX_LENGTH 30
+
 int choose_login_register_option(void)
 {
     int option = 0;
@@ -51,8 +53,8 @@ int choose_account_data_option(void)
 
 int login(sqlite3 *db)
 {
-    char *username = get_string("\n\tUsername: ", 30);
-    char *password = get_string("\tMaster password: ", 30);
+    char *username = get_string("\n\tUsername: ", MAX_LENGTH);
+    char *password = get_string("\tMaster password: ", MAX_LENGTH);
 
     // Validate input
     if (strlen(username) == 0 || strlen(password) == 0)
@@ -89,10 +91,11 @@ int login(sqlite3 *db)
 int register_user(sqlite3 *db)
 {
     User *user =(User *)malloc(sizeof(User));
-    user->first_name = get_string("\nFirst name: ", 30);
-    user->last_name = get_string("Last name: ", 30);
-    user->username = get_string("Username: ", 30);
-    user->password = get_string("Master password: ", 30);
+    
+    user->first_name = get_string("\nFirst name: ", MAX_LENGTH);
+    user->last_name = get_string("Last name: ", MAX_LENGTH);
+    user->username = get_string("Username: ", MAX_LENGTH);
+    user->password = get_string("Master password: ", MAX_LENGTH);
 
     // Validate user
     if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
@@ -115,9 +118,10 @@ int register_user(sqlite3 *db)
 int add_account_data(sqlite3 *db)
 {
     Account *account = (Account *)malloc(sizeof(Account));
-    account->site = get_string("\n\tSite: ", 30);
-    account->username = get_string("\tUsername: ", 30);
-    account->password = get_string("\tpassword: ", 30);
+
+    account->site = get_string("\n\tSite: ", MAX_LENGTH);
+    account->username = get_string("\tUsername: ", MAX_LENGTH);
+    account->password = get_string("\tpassword: ", MAX_LENGTH);
 
     // Validate input
     if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(account->password) == 0)

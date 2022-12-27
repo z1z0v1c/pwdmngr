@@ -16,7 +16,7 @@ int main(void)
     {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
-        return (0);
+        return 0;
     }
 
     printf("Choose options by specifying a number\n");
@@ -54,14 +54,14 @@ int main(void)
             break;
         }
 
-        char should_continue[3];
-        printf("\nDo you want to continue (y/n): ");
-        scanf("%s", should_continue);
+        char *should_continue = get_string("\nDo you want to continue (y/n): ", 3);
 
         if (strcmp("y", should_continue) != 0 && strcmp("yes", should_continue) != 0)
         {
             break;
         }
+
+        free(should_continue);
     }
 
     sqlite3_close(db);
