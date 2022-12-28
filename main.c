@@ -49,19 +49,12 @@ int main(void)
         case 5:
             list_all_accounts(db);
             break;
+        case 6:
+            return 0;
 
         default:
             break;
         }
-
-        char *should_continue = get_string("\nDo you want to continue (y/n): ", 3);
-
-        if (strcmp("y", should_continue) != 0 && strcmp("yes", should_continue) != 0)
-        {
-            break;
-        }
-
-        free(should_continue);
     }
 
     sqlite3_close(db);

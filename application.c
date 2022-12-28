@@ -32,13 +32,14 @@ int choose_account_data_option(void)
 {
     int option = 0;
 
-    while (option != 1 && option != 2 && option != 3 && option != 4 && option != 5)
+    while (option != 1 && option != 2 && option != 3 && option != 4 && option != 5 && option != 6)
     {
         printf("\n1. Generate password \n");
         printf("2. Add account\n");
         printf("3. Edit account\n");
         printf("4. Delete account\n");
         printf("5. List all accounts\n");
+        printf("6. Exit\n");
         printf("\nChoose an option : ");
 
         scanf("%d", &option);
@@ -90,8 +91,8 @@ int login(sqlite3 *db)
 
 int register_user(sqlite3 *db)
 {
-    User *user =(User *)malloc(sizeof(User));
-    
+    User *user = (User *)malloc(sizeof(User));
+
     user->first_name = get_string("\nFirst name: ", MAX_LENGTH);
     user->last_name = get_string("Last name: ", MAX_LENGTH);
     user->username = get_string("Username: ", MAX_LENGTH);
