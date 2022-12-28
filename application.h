@@ -10,6 +10,7 @@ typedef struct
 
 typedef struct
 {
+    int id;
     int user_id;
     char *site;
     char *username;
