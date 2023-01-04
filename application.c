@@ -143,5 +143,22 @@ int add_account_data(sqlite3 *db)
 
 int list_all_accounts(sqlite3 *db)
 {
+    int user_id = atoi(getenv("SESSION_ID"));
+    int size;
+    Account *user_accounts = get_all_accounts(db, user_id, &size);
+    if (user_accounts == NULL)
+    {
+        return -1;
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        printf("\n\t%d. Site: %s", i + 1, user_accounts[i].site);
+        free(user_accounts[i].site);
+        free(user_accounts[i].username);
+        free(user_accounts[i].password);
+    }
+
+    free(user_accounts);
     return 0;
 }

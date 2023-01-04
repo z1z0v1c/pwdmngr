@@ -14,9 +14,8 @@ int main(void)
 
     if (rc)
     {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-        return 0;
+        fprintf(stderr, "Error opening database: %s\n", sqlite3_errmsg(db));
+        return 1;
     }
 
     printf("Choose options by specifying a number\n");
@@ -31,12 +30,15 @@ int main(void)
     case 1:
         login(db);
         break;
-
     default:
-        break;
+        fprintf(stderr, "Invalid option\n");
+        sqlite3_close(db);
+        return 1;
     }
 
-    while (1)
+    // main loop
+    int running = 1;
+    while (running)
     {
         // Ask user to choose the option
         option = choose_account_data_option();
@@ -50,9 +52,10 @@ int main(void)
             list_all_accounts(db);
             break;
         case 6:
-            return 0;
-
+            running = 0;
+            break;
         default:
+            fprintf(stderr, "Invalid option\n");
             break;
         }
     }
