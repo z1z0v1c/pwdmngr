@@ -153,7 +153,7 @@ int list_all_accounts(sqlite3 *db)
 
     for (int i = 0; i < size; i++)
     {
-        printf("\n\t%d. Site: %s", i + 1, user_accounts[i].site);
+        printf("\n\t%d. Id: %d | Site: %s | Username: %s | Password: %s", i + 1, user_accounts[i].id, user_accounts[i].site, user_accounts[i].username, user_accounts[i].password);
         free(user_accounts[i].site);
         free(user_accounts[i].username);
         free(user_accounts[i].password);
