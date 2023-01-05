@@ -4,6 +4,29 @@
 #include "application.h"
 #include "database.h"
 
+int delete_account_by_id(sqlite3 *db, int id)
+{
+    int user_id = atoi(getenv("SESSION_ID"));
+
+    // Construct the delete statement
+    char *delete_query = sqlite3_mprintf("DELETE FROM accounts WHERE user_id = %d and id = %d;", user_id, id);
+
+    // Execute the delete statement
+    char *zErrMsg = 0;
+    int rc = sqlite3_exec(db, delete_query, 0, 0, &zErrMsg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        sqlite3_free(delete_query);
+        return -1;
+    }
+
+    // Free memory
+    sqlite3_free(delete_query);
+    return 0;
+}
+
 Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
 {
     int rc;
@@ -69,6 +92,8 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
         // shrink the array to the actual number of accounts
         accounts = realloc(accounts, sizeof(Account) * count);
     }
+
+    *size = count;
 
     sqlite3_finalize(res);
     return accounts;

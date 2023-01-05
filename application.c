@@ -141,6 +141,16 @@ int add_account_data(sqlite3 *db)
     return 0;
 }
 
+int delete_account(sqlite3 *db)
+{
+    int *id = get_int("\n\tAccount id: ");
+
+    delete_account_by_id(db, *id);
+    
+    free(id);
+    return 0;
+}
+
 int list_all_accounts(sqlite3 *db)
 {
     int user_id = atoi(getenv("SESSION_ID"));

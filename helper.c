@@ -51,3 +51,12 @@ char *get_string(char *tip, int len)
 
     return str;
 }
+
+int *get_int(char *tip)
+{
+    int *num = malloc(sizeof(int));
+    printf("%s", tip);
+    scanf("%d", num);
+
+    return num;
+}
