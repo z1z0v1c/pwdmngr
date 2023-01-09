@@ -146,7 +146,7 @@ int delete_account(sqlite3 *db)
     int *id = get_int("\n\tAccount id: ");
 
     delete_account_by_id(db, *id);
-    
+
     free(id);
     return 0;
 }
@@ -168,6 +168,8 @@ int list_all_accounts(sqlite3 *db)
         free(user_accounts[i].username);
         free(user_accounts[i].password);
     }
+
+    printf("%s", "\n"); 
 
     free(user_accounts);
     return 0;
