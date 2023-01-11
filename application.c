@@ -159,7 +159,9 @@ int edit_account(sqlite3 *db)
 
     printf("%s", account->site);
 
+    free_account(account);
     free(id);
+    
     return 0;
 }
 
