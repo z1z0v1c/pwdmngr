@@ -48,6 +48,9 @@ int main(void)
         case 2:
             add_account_data(db);
             break;
+        case 3:
+            edit_account(db);
+            break;
         case 4:
             delete_account(db);
             break;

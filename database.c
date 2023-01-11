@@ -27,6 +27,53 @@ int delete_account_by_id(sqlite3 *db, int id)
     return 0;
 }
 
+Account *get_account_by_id(sqlite3 *db, int *id)
+{
+    int rc;
+    Account *account = malloc(sizeof(Account));
+    sqlite3_stmt *res = NULL;
+
+    rc = sqlite3_prepare_v2(db, "SELECT * FROM accounts WHERE id = ?", -1, &res, 0);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        free(account);
+        return NULL;
+    }
+
+    sqlite3_bind_int(res, 1, *id);
+
+    if ((rc = sqlite3_step(res)) == SQLITE_ROW)
+    {
+        // process the values in the row
+        account->id = sqlite3_column_int(res, 0);
+        account->user_id = sqlite3_column_int(res, 1);
+        account->site = malloc(sqlite3_column_bytes(res, 2) + 1);
+        strcpy(account->site, (char *)sqlite3_column_text(res, 2));
+        account->username = malloc(sqlite3_column_bytes(res, 3) + 1);
+        strcpy(account->username, (char *)sqlite3_column_text(res, 3));
+        account->password = malloc(sqlite3_column_bytes(res, 4) + 1);
+        strcpy(account->password, (char *)sqlite3_column_text(res, 4));
+    }
+    if (rc != SQLITE_DONE)
+    {
+        fprintf(stderr, "Error stepping statement: %s\n", sqlite3_errmsg(db));
+        free(account);
+        sqlite3_finalize(res);
+        return NULL;
+    }
+
+    // check if no accounts were found
+    if (account == NULL)
+    {
+        fprintf(stderr, "No accounts found for user ID %d\n", *id);
+        free(account);
+    }
+
+    sqlite3_finalize(res);
+    return account;
+}
+
 Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
 {
     int rc;

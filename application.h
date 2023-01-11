@@ -23,4 +23,5 @@ int login(sqlite3 *db);
 int register_user(sqlite3 *db);
 int add_account_data(sqlite3 *db);
 int delete_account(sqlite3 *db);
+int edit_account(sqlite3 *db);
 int list_all_accounts(sqlite3 *db);
