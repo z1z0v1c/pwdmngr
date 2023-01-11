@@ -155,7 +155,7 @@ int edit_account(sqlite3 *db)
 {
     int *id = get_int("\n\tAccount id: ");
 
-    Account *account = get_account_by_id(db, id);
+    Account *account = get_account_by_id(db, *id);
 
     printf("%s", account->site);
 

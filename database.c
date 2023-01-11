@@ -27,7 +27,7 @@ int delete_account_by_id(sqlite3 *db, int id)
     return 0;
 }
 
-Account *get_account_by_id(sqlite3 *db, int *id)
+Account *get_account_by_id(sqlite3 *db, int id)
 {
     int rc;
     Account *account = malloc(sizeof(Account));
@@ -41,7 +41,7 @@ Account *get_account_by_id(sqlite3 *db, int *id)
         return NULL;
     }
 
-    sqlite3_bind_int(res, 1, *id);
+    sqlite3_bind_int(res, 1, id);
 
     if ((rc = sqlite3_step(res)) == SQLITE_ROW)
     {
@@ -55,18 +55,11 @@ Account *get_account_by_id(sqlite3 *db, int *id)
         account->password = malloc(sqlite3_column_bytes(res, 4) + 1);
         strcpy(account->password, (char *)sqlite3_column_text(res, 4));
     }
-    if (rc != SQLITE_DONE)
-    {
-        fprintf(stderr, "Error stepping statement: %s\n", sqlite3_errmsg(db));
-        free(account);
-        sqlite3_finalize(res);
-        return NULL;
-    }
 
     // check if no accounts were found
     if (account == NULL)
     {
-        fprintf(stderr, "No accounts found for user ID %d\n", *id);
+        fprintf(stderr, "No accounts found for user ID %d\n", id);
         free(account);
     }
 
