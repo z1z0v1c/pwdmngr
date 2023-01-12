@@ -252,3 +252,27 @@ int save_user(sqlite3 *db, User *user)
 
     return 0;
 }
+
+int update_account(sqlite3 *db, Account *account)
+{
+    // Construct the INSERT statement
+    char *update_query = sqlite3_mprintf(
+        "UPDATE accounts SET username = '%q', password = '%q' WHERE id = '%d'",
+        account->username, account->password, account->id);
+
+    // Execute the INSERT statement
+    char *zErrMsg = 0;
+    int rc = sqlite3_exec(db, update_query, 0, 0, &zErrMsg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        sqlite3_free(update_query);
+        return -1;
+    }
+
+    // Free memory
+    sqlite3_free(update_query);
+
+    return 0;
+}

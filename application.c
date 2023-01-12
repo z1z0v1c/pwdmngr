@@ -122,7 +122,7 @@ int add_account_data(sqlite3 *db)
 
     account->site = get_string("\n\tSite: ", MAX_LENGTH);
     account->username = get_string("\tUsername: ", MAX_LENGTH);
-    account->password = get_string("\tpassword: ", MAX_LENGTH);
+    account->password = get_string("\tPassword: ", MAX_LENGTH);
 
     // Validate input
     if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(account->password) == 0)
@@ -157,7 +157,13 @@ int edit_account(sqlite3 *db)
 
     Account *account = get_account_by_id(db, *id);
 
-    printf("%s", account->site);
+    free(account->username);
+    free(account->password);
+
+    account->username = get_string("\tUsername: ", MAX_LENGTH);
+    account->password = get_string("\tPassword: ", MAX_LENGTH);
+
+    update_account(db, account);
 
     free_account(account);
     free(id);
