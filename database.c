@@ -159,8 +159,7 @@ char *get_users_password(sqlite3 *db, char *username)
     {
         printf("\nUsername are incorrect\n");
         sqlite3_finalize(res);
-        char *password = "wrong password";
-        return password;
+        exit(1);
     }
 
     char *password = (char *)sqlite3_column_text(res, 0);

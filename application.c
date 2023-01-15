@@ -71,7 +71,7 @@ int login(sqlite3 *db)
     if (strcmp(db_password, password) != 0)
     {
         printf("\nPassword are incorrect\n");
-        return 0;
+        exit(1);
     }
 
     const int user_id = get_users_id(db, username);
