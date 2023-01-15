@@ -45,6 +45,9 @@ int main(void)
 
         switch (option)
         {
+        case 1:
+            generate_password();
+            break;
         case 2:
             add_account_data(db);
             break;

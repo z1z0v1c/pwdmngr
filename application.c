@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <string.h>
+#include <time.h>
 #include "application.h"
 #include "database.h"
 #include "helper.h"
@@ -50,6 +51,72 @@ int choose_account_data_option(void)
     }
 
     return option;
+}
+
+int choose_password_option(void)
+{
+    int option = 0;
+
+    while (option != 1 && option != 2 && option != 3)
+    {
+        printf("\n\t1. Letters and numbers \n");
+        printf("\t2. Letters and special characters \n");
+        printf("\t3. All \n");
+        printf("\n\tChoose an option : ");
+
+        scanf("%d", &option);
+
+        // Flush the buffer
+        char line[100];
+        fgets(line, sizeof(line), stdin);
+    }
+
+    return option;
+}
+
+void generate_letters_numbers(int length, char *password)
+{
+    for (int i = 0; i < length; i++)
+    {
+        char character = (char)(rand() % (122 - 48 + 1) + 48);
+
+        if ((character > '9' && character < 'A') || (character > 'Z' && character < 'a'))
+        {
+            i--;
+            continue;
+        }
+
+        password[i] = character;
+    }
+
+    password[length + 1] = '\0';
+}
+
+int generate_password()
+{
+    int *length = get_int("\n\tSpecify length: "); 
+    char *password = malloc(sizeof(char) * *length + 1);
+    memset(password, 0, *length + 1);
+
+    int option = choose_password_option();
+
+    switch (option)
+    {
+    case 1:
+        generate_letters_numbers(*length, password);
+        break;
+    
+    default:
+        *password = '\0';
+        break;
+    }
+
+    printf("\n\t\tGenerated password: %s\n", password);
+
+    free(length);
+    free(password);
+
+    return 0;
 }
 
 int login(sqlite3 *db)
