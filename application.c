@@ -14,8 +14,8 @@ int choose_login_register_option(void)
 
     while (option != 1 && option != 2)
     {
-        printf("\n1. Login \n");
-        printf("2. Register \n");
+        printf("\n1. Register \n");
+        printf("2. Login \n");
         printf("\nChoose an option: ");
 
         scanf("%d", &option);

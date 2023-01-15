@@ -25,9 +25,9 @@ int main(void)
 
     switch (option)
     {
-    case 2:
-        register_user(db);
     case 1:
+        register_user(db);
+    case 2:
         login(db);
         break;
     default:
