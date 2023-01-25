@@ -89,7 +89,7 @@ void generate_letters_numbers(int length, char *password)
         password[i] = character;
     }
 
-    password[length + 1] = '\0';
+    password[length] = '\0';
 }
 
 int generate_password()
