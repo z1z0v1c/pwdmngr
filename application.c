@@ -74,6 +74,17 @@ int choose_password_option(void)
     return option;
 }
 
+void generate_all(int length, char *password)
+{
+    for (int i = 0; i < length; i++)
+    {
+        char character = (char)(rand() % (126 - 33 + 1) + 33);
+        password[i] = character;
+    }
+
+    password[length] = '\0';
+}
+
 void generate_letters_chars(int length, char *password)
 {
     for (int i = 0; i < length; i++)
@@ -125,6 +136,9 @@ int generate_password()
         break;
     case 2:
         generate_letters_chars(*length, password);
+        break;
+    case 3:
+        generate_all(*length, password);
         break;
     
     default:
