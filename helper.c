@@ -5,14 +5,15 @@
 #include "application.h"
 #include "helper.h"
 
+// Free memory for all args 
 void free_all(int count, ...)
 {
     va_list args;
 
-    // initialize the variable argument list
+    // Initialize the variable argument list
     va_start(args, count);
 
-    // iterate over the arguments and add them to the total
+    // Iterate over the arguments and add them to the total
     for (int i = 0; i < count; i++)
     {
         char *ptr = va_arg(args, char *);
@@ -22,10 +23,11 @@ void free_all(int count, ...)
         }
     }
 
-    // clean up the variable argument list
+    // Clean up the variable argument list
     va_end(args);
 }
 
+// Free memory for an user
 void free_user(User *user)
 {
     free(user->first_name);
@@ -35,6 +37,7 @@ void free_user(User *user)
     free(user);
 }
 
+// Free memory for an account
 void free_account(Account *account)
 {
     free(account->site);
@@ -43,6 +46,7 @@ void free_account(Account *account)
     free(account);
 }
 
+// Get text input from user
 char *get_string(char *tip, int len)
 {
     char *str = malloc(len + 1);
@@ -52,6 +56,7 @@ char *get_string(char *tip, int len)
     return str;
 }
 
+// Get a number from user
 int *get_int(char *tip)
 {
     int *num = malloc(sizeof(int));

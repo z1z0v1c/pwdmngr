@@ -8,22 +8,23 @@ int delete_account_by_id(sqlite3 *db, int id)
 {
     int user_id = atoi(getenv("SESSION_ID"));
 
-    // Construct the delete statement
+    // Construct DELETE statement
     char *delete_query = sqlite3_mprintf("DELETE FROM accounts WHERE user_id = %d and id = %d;", user_id, id);
 
-    // Execute the delete statement
-    char *zErrMsg = 0;
-    int rc = sqlite3_exec(db, delete_query, 0, 0, &zErrMsg);
+    // Execute DELETE statement
+    char *error_message = 0;
+    int rc = sqlite3_exec(db, delete_query, 0, 0, &error_message);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
+        fprintf(stderr, "SQL error: %s\n", error_message);
+        sqlite3_free(error_message);
         sqlite3_free(delete_query);
         return -1;
     }
 
     // Free memory
     sqlite3_free(delete_query);
+
     return 0;
 }
 
@@ -33,6 +34,7 @@ Account *get_account_by_id(sqlite3 *db, int id)
     Account *account = malloc(sizeof(Account));
     sqlite3_stmt *res = NULL;
 
+    // Construct the SELECT query
     rc = sqlite3_prepare_v2(db, "SELECT * FROM accounts WHERE id = ?", -1, &res, 0);
     if (rc != SQLITE_OK)
     {
@@ -45,7 +47,7 @@ Account *get_account_by_id(sqlite3 *db, int id)
 
     if ((rc = sqlite3_step(res)) == SQLITE_ROW)
     {
-        // process the values in the row
+        // Process the values in row
         account->id = sqlite3_column_int(res, 0);
         account->user_id = sqlite3_column_int(res, 1);
         account->site = malloc(sqlite3_column_bytes(res, 2) + 1);
@@ -56,14 +58,16 @@ Account *get_account_by_id(sqlite3 *db, int id)
         strcpy(account->password, (char *)sqlite3_column_text(res, 4));
     }
 
-    // check if no accounts were found
+    // Check if no accounts were found
     if (account == NULL)
     {
         fprintf(stderr, "No accounts found for user ID %d\n", id);
         free(account);
     }
 
+    // Free memory
     sqlite3_finalize(res);
+
     return account;
 }
 
@@ -75,6 +79,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     Account *accounts = malloc(sizeof(Account) * *size);
     sqlite3_stmt *res = NULL;
 
+    // Construct the SELECT query
     rc = sqlite3_prepare_v2(db, "SELECT * FROM accounts WHERE user_id = ?", -1, &res, 0);
     if (rc != SQLITE_OK)
     {
@@ -87,7 +92,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
 
     while ((rc = sqlite3_step(res)) == SQLITE_ROW)
     {
-        // reallocate the accounts array if needed
+        // Reallocate the accounts array if needed
         if (count == *size)
         {
             *size *= 2;
@@ -100,7 +105,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
             }
         }
 
-        // process the values in the current row
+        // Process the values in the current row
         accounts[count].id = sqlite3_column_int(res, 0);
         accounts[count].user_id = sqlite3_column_int(res, 1);
         accounts[count].site = malloc(sqlite3_column_bytes(res, 2) + 1);
@@ -120,7 +125,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
         return NULL;
     }
 
-    // check if no accounts were found
+    // Check if no accounts were found
     if (count == 0)
     {
         fprintf(stderr, "No accounts found for user ID %d\n", user_id);
@@ -129,21 +134,25 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     }
     else
     {
-        // shrink the array to the actual number of accounts
+        // Shrink the array to the actual number of accounts
         accounts = realloc(accounts, sizeof(Account) * count);
     }
 
     *size = count;
 
+    // Free memory
     sqlite3_finalize(res);
+
     return accounts;
 }
 
 char *get_users_password(sqlite3 *db, char *username)
 {
+    // Construct the SELECT query
     sqlite3_stmt *res;
     int rc = sqlite3_prepare_v2(db, "SELECT password FROM users WHERE username = ?", -1, &res, 0);
 
+    // Validate query
     if (rc == SQLITE_OK)
     {
         sqlite3_bind_text(res, 1, username, -1, NULL);
@@ -162,6 +171,7 @@ char *get_users_password(sqlite3 *db, char *username)
         exit(1);
     }
 
+    // Get data
     char *password = (char *)sqlite3_column_text(res, 0);
     int password_length = strlen(password);
 
@@ -169,15 +179,19 @@ char *get_users_password(sqlite3 *db, char *username)
     strncpy(result, password, password_length);
     result[password_length] = '\0';
 
+    // Free memory
     sqlite3_finalize(res);
+
     return result;
 }
 
 int get_users_id(sqlite3 *db, char *username)
 {
+    // Construct the SELECT query
     sqlite3_stmt *res;
     int rc = sqlite3_prepare_v2(db, "SELECT user_id FROM users WHERE username = ?", -1, &res, 0);
 
+    // Validate query
     if (rc == SQLITE_OK)
     {
         sqlite3_bind_text(res, 1, username, -1, NULL);
@@ -196,9 +210,12 @@ int get_users_id(sqlite3 *db, char *username)
         return -1;
     }
 
+    // Get data
     int user_id = sqlite3_column_int(res, 0);
 
+    // Free memory
     sqlite3_finalize(res);
+
     return user_id;
 }
 
@@ -211,12 +228,12 @@ int save_account(sqlite3 *db, Account *account)
         account->user_id, account->site, account->username, account->password);
 
     // Execute the INSERT statement
-    char *zErrMsg = 0;
-    int rc = sqlite3_exec(db, insert_query, 0, 0, &zErrMsg);
+    char *error_message = 0;
+    int rc = sqlite3_exec(db, insert_query, 0, 0, &error_message);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
+        fprintf(stderr, "SQL error: %s\n", error_message);
+        sqlite3_free(error_message);
         sqlite3_free(insert_query);
         return -1;
     }
@@ -236,12 +253,12 @@ int save_user(sqlite3 *db, User *user)
         user->first_name, user->last_name, user->username, user->password);
 
     // Execute the INSERT statement
-    char *zErrMsg = 0;
-    int rc = sqlite3_exec(db, insert_query, 0, 0, &zErrMsg);
+    char *error_message = 0;
+    int rc = sqlite3_exec(db, insert_query, 0, 0, &error_message);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
+        fprintf(stderr, "SQL error: %s\n", error_message);
+        sqlite3_free(error_message);
         sqlite3_free(insert_query);
         return -1;
     }
@@ -260,12 +277,12 @@ int update_account(sqlite3 *db, Account *account)
         account->username, account->password, account->id);
 
     // Execute the INSERT statement
-    char *zErrMsg = 0;
-    int rc = sqlite3_exec(db, update_query, 0, 0, &zErrMsg);
+    char *error_message = 0;
+    int rc = sqlite3_exec(db, update_query, 0, 0, &error_message);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
+        fprintf(stderr, "SQL error: %s\n", error_message);
+        sqlite3_free(error_message);
         sqlite3_free(update_query);
         return -1;
     }

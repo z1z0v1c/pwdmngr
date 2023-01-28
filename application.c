@@ -74,6 +74,7 @@ int choose_password_option(void)
     return option;
 }
 
+// Generate password with letters, special chars, and nums
 void generate_all(int length, char *password)
 {
     for (int i = 0; i < length; i++)
@@ -85,12 +86,14 @@ void generate_all(int length, char *password)
     password[length] = '\0';
 }
 
+// Generate password with letters and special chars
 void generate_letters_chars(int length, char *password)
 {
     for (int i = 0; i < length; i++)
     {
         char character = (char)(rand() % (126 - 33 + 1) + 33);
 
+        // Escape non-valid chars
         if (character > '/' && character < ':')
         {
             i--;
@@ -103,12 +106,14 @@ void generate_letters_chars(int length, char *password)
     password[length] = '\0';
 }
 
+// Generate password with letters and nums
 void generate_letters_numbers(int length, char *password)
 {
     for (int i = 0; i < length; i++)
     {
         char character = (char)(rand() % (122 - 48 + 1) + 48);
 
+        // Escape non-valid chars
         if ((character > '9' && character < 'A') || (character > 'Z' && character < 'a'))
         {
             i--;
@@ -200,7 +205,7 @@ int register_user(sqlite3 *db)
     user->username = get_string("Username: ", MAX_LENGTH);
     user->password = get_string("Master password: ", MAX_LENGTH);
 
-    // Validate user
+    // Validate input
     if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
         strlen(user->username) == 0 || strlen(user->password) == 0)
     {
@@ -208,12 +213,10 @@ int register_user(sqlite3 *db)
         return -1;
     }
 
-    // Save user to db
     save_user(db, user);
 
     printf("\nRegister successfull\n");
 
-    // Free user
     free_user(user);
     return 0;
 }
@@ -233,6 +236,7 @@ int add_account_data(sqlite3 *db)
         return -1;
     }
 
+    // Get user's Id from session
     account->user_id = atoi(getenv("SESSION_ID"));
 
     save_account(db, account);
@@ -245,6 +249,7 @@ int add_account_data(sqlite3 *db)
 
 int delete_account(sqlite3 *db)
 {
+    // Get Id of account from user
     int *id = get_int("\n\tAccount id: ");
 
     delete_account_by_id(db, *id);
@@ -255,6 +260,7 @@ int delete_account(sqlite3 *db)
 
 int edit_account(sqlite3 *db)
 {
+    // Get Id of account from user
     int *id = get_int("\n\tAccount id: ");
 
     Account *account = get_account_by_id(db, *id);
@@ -283,9 +289,12 @@ int list_all_accounts(sqlite3 *db)
         return -1;
     }
 
+    // Print all acounts
     for (int i = 0; i < size; i++)
     {
-        printf("\n\t%d. Id: %d | Site: %s | Username: %s | Password: %s", i + 1, user_accounts[i].id, user_accounts[i].site, user_accounts[i].username, user_accounts[i].password);
+        printf("\n\t%d. Id: %d | Site: %s | Username: %s | Password: %s", i + 1,
+            user_accounts[i].id, user_accounts[i].site, user_accounts[i].username, user_accounts[i].password);
+
         free(user_accounts[i].site);
         free(user_accounts[i].username);
         free(user_accounts[i].password);
