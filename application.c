@@ -131,7 +131,7 @@ void generate_letters_numbers(int length, char *password)
 
 int generate_password()
 {
-    int *length = get_int("\n\tSpecify length: "); 
+    int *length = get_int("\n\tSpecify length: ");
 
     password = malloc(sizeof(char) * *length + 1);
     memset(password, 0, *length + 1);
@@ -149,7 +149,7 @@ int generate_password()
     case 3:
         generate_all(*length, password);
         break;
-    
+
     default:
         *password = '\0';
         break;
@@ -231,8 +231,8 @@ int add_account_data(sqlite3 *db)
     account->site = get_string("\n\tSite: ", MAX_LENGTH);
     account->username = get_string("\tUsername: ", MAX_LENGTH);
 
-    char *pass= get_string("\tPassword (enter * to use generated one): ", MAX_LENGTH);
-    
+    char *pass = get_string("\tPassword (enter * to use generated one): ", MAX_LENGTH);
+
     // Validate input
     if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(pass) == 0)
     {
@@ -244,7 +244,13 @@ int add_account_data(sqlite3 *db)
     {
         if (password == NULL)
         {
-            account->password = get_string("\tNo password generated. Enter another one: ", MAX_LENGTH);
+            printf("\n\t\tNo password generated. Account is not saved");
+
+            // Free memory
+            free_account(account);
+            free(pass);
+
+            return 1;
         }
         else
         {
@@ -252,7 +258,7 @@ int add_account_data(sqlite3 *db)
             account->password = password;
         }
     }
-    else     
+    else
     {
         account->password = pass;
     }
@@ -262,11 +268,13 @@ int add_account_data(sqlite3 *db)
 
     save_account(db, account);
 
-    printf("\nSuccessfull\n");
+    // It is already freed if it is assigned to an account
+    if (strcmp(pass, "*") == 0)
+    {
+        free(pass);
+    }
 
-    // Free memory
     free_account(account);
-    free(pass);
 
     return 0;
 }
@@ -294,8 +302,8 @@ int edit_account(sqlite3 *db)
 
     account->username = get_string("\tUsername: ", MAX_LENGTH);
 
-    char *pass= get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
-    
+    char *pass = get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
+
     // Validate input
     if (strlen(account->username) == 0 || strlen(pass) == 0)
     {
@@ -315,7 +323,7 @@ int edit_account(sqlite3 *db)
             account->password = password;
         }
     }
-    else     
+    else
     {
         account->password = pass;
     }
@@ -325,7 +333,7 @@ int edit_account(sqlite3 *db)
     free_account(account);
     free(pass);
     free(id);
-    
+
     return 0;
 }
 
@@ -343,14 +351,14 @@ int list_all_accounts(sqlite3 *db)
     for (int i = 0; i < size; i++)
     {
         printf("\n\t%d. Id: %d | Site: %s | Username: %s | Password: %s", i + 1,
-            user_accounts[i].id, user_accounts[i].site, user_accounts[i].username, user_accounts[i].password);
+               user_accounts[i].id, user_accounts[i].site, user_accounts[i].username, user_accounts[i].password);
 
         free(user_accounts[i].site);
         free(user_accounts[i].username);
         free(user_accounts[i].password);
     }
 
-    printf("%s", "\n"); 
+    printf("%s", "\n");
 
     free(user_accounts);
     return 0;

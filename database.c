@@ -230,12 +230,18 @@ int save_account(sqlite3 *db, Account *account)
     // Execute the INSERT statement
     char *error_message = 0;
     int rc = sqlite3_exec(db, insert_query, 0, 0, &error_message);
+
+    // Check success
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "SQL error: %s\n", error_message);
         sqlite3_free(error_message);
         sqlite3_free(insert_query);
         return -1;
+    }
+    else
+    {
+        printf("\n\t\tAccount saved successfully\n");
     }
 
     // Free memory
