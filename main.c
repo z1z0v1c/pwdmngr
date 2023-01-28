@@ -35,6 +35,9 @@ int main(void)
             login(db);
             running = 0;
             break;
+        case 3:
+            sqlite3_close(db);
+            return 0;
         default:
             fprintf(stderr, "Invalid option\n");
             break;

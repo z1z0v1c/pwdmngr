@@ -15,10 +15,11 @@ int choose_login_register_option(void)
 {
     int option = 0;
 
-    while (option != 1 && option != 2)
+    while (option != 1 && option != 2 && option != 3)
     {
         printf("\n1. Register \n");
         printf("2. Login \n");
+        printf("3. Exit \n");
         printf("\nChoose an option: ");
 
         scanf("%d", &option);
@@ -192,7 +193,7 @@ int login(sqlite3 *db)
     // Track session
     setenv("SESSION_ID", user, 1);
 
-    printf("\nLogin successfull\n");
+    printf("\n\t\tLogin successfull\n");
 
     free_all(3, username, password, db_password);
     return 0;
@@ -230,7 +231,7 @@ int add_account_data(sqlite3 *db)
     account->site = get_string("\n\tSite: ", MAX_LENGTH);
     account->username = get_string("\tUsername: ", MAX_LENGTH);
 
-    char *pass= get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
+    char *pass= get_string("\tPassword (enter * to use generated one): ", MAX_LENGTH);
     
     // Validate input
     if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(pass) == 0)
@@ -243,7 +244,7 @@ int add_account_data(sqlite3 *db)
     {
         if (password == NULL)
         {
-            account->password = get_string("\tNo generated password. Enter another one: ", MAX_LENGTH);
+            account->password = get_string("\tNo password generated. Enter another one: ", MAX_LENGTH);
         }
         else
         {
