@@ -9,6 +9,8 @@
 
 #define MAX_LENGTH 30
 
+char *password = NULL;
+
 int choose_login_register_option(void)
 {
     int option = 0;
@@ -129,7 +131,8 @@ void generate_letters_numbers(int length, char *password)
 int generate_password()
 {
     int *length = get_int("\n\tSpecify length: "); 
-    char *password = malloc(sizeof(char) * *length + 1);
+
+    password = malloc(sizeof(char) * *length + 1);
     memset(password, 0, *length + 1);
 
     int option = choose_password_option();
@@ -154,7 +157,6 @@ int generate_password()
     printf("\n\t\tGenerated password: %s\n", password);
 
     free(length);
-    free(password);
 
     return 0;
 }
@@ -227,13 +229,31 @@ int add_account_data(sqlite3 *db)
 
     account->site = get_string("\n\tSite: ", MAX_LENGTH);
     account->username = get_string("\tUsername: ", MAX_LENGTH);
-    account->password = get_string("\tPassword: ", MAX_LENGTH);
 
+    char *pass= get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
+    
     // Validate input
-    if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(account->password) == 0)
+    if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(pass) == 0)
     {
         fprintf(stderr, "Error: All fields are required\n");
         return -1;
+    }
+
+    if (strcmp(pass, "*") == 0)
+    {
+        if (password == NULL)
+        {
+            account->password = get_string("\tNo generated password. Enter another one: ", MAX_LENGTH);
+        }
+        else
+        {
+            // Use generated password
+            account->password = password;
+        }
+    }
+    else     
+    {
+        account->password = pass;
     }
 
     // Get user's Id from session
@@ -243,7 +263,10 @@ int add_account_data(sqlite3 *db)
 
     printf("\nSuccessfull\n");
 
+    // Free memory
     free_account(account);
+    free(pass);
+
     return 0;
 }
 
