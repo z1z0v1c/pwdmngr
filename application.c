@@ -292,11 +292,37 @@ int edit_account(sqlite3 *db)
     free(account->password);
 
     account->username = get_string("\tUsername: ", MAX_LENGTH);
-    account->password = get_string("\tPassword: ", MAX_LENGTH);
+
+    char *pass= get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
+    
+    // Validate input
+    if (strlen(account->username) == 0 || strlen(pass) == 0)
+    {
+        fprintf(stderr, "Error: All fields are required\n");
+        return -1;
+    }
+
+    if (strcmp(pass, "*") == 0)
+    {
+        if (password == NULL)
+        {
+            account->password = get_string("\tNo generated password. Enter another one: ", MAX_LENGTH);
+        }
+        else
+        {
+            // Use generated password
+            account->password = password;
+        }
+    }
+    else     
+    {
+        account->password = pass;
+    }
 
     update_account(db, account);
 
     free_account(account);
+    free(pass);
     free(id);
     
     return 0;
