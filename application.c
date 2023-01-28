@@ -202,10 +202,10 @@ int register_user(sqlite3 *db)
 {
     User *user = (User *)malloc(sizeof(User));
 
-    user->first_name = get_string("\nFirst name: ", MAX_LENGTH);
-    user->last_name = get_string("Last name: ", MAX_LENGTH);
-    user->username = get_string("Username: ", MAX_LENGTH);
-    user->password = get_string("Master password: ", MAX_LENGTH);
+    user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
+    user->last_name = get_string("\tLast name: ", MAX_LENGTH);
+    user->username = get_string("\tUsername: ", MAX_LENGTH);
+    user->password = get_string("\tMaster password: ", MAX_LENGTH);
 
     // Validate input
     if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
@@ -215,12 +215,12 @@ int register_user(sqlite3 *db)
         return -1;
     }
 
-    save_user(db, user);
+    int success = save_user(db, user);
 
-    printf("\nRegister successfull\n");
-
+    // Free memory
     free_user(user);
-    return 0;
+
+    return success;
 }
 
 int add_account_data(sqlite3 *db)

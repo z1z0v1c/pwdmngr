@@ -255,18 +255,27 @@ int save_user(sqlite3 *db, User *user)
     // Execute the INSERT statement
     char *error_message = 0;
     int rc = sqlite3_exec(db, insert_query, 0, 0, &error_message);
+
+    // Check success
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "SQL error: %s\n", error_message);
+        printf("\n\t\tUsername %s already exists. Try again.\n", user->username);
+
+        // Free memory
         sqlite3_free(error_message);
         sqlite3_free(insert_query);
+
         return -1;
     }
+    else
+    {
+        printf("\n\t\tRegistered successfully\n");
 
-    // Free memory
-    sqlite3_free(insert_query);
+        // Free memory
+        sqlite3_free(insert_query);
 
-    return 0;
+        return 0;
+    } 
 }
 
 int update_account(sqlite3 *db, Account *account)

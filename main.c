@@ -20,28 +20,33 @@ int main(void)
 
     printf("Choose options by specifying a number\n");
 
-    // Ask user to choose the option
-    int option = choose_login_register_option();
-
-    switch (option)
-    {
-    case 1:
-        register_user(db);
-    case 2:
-        login(db);
-        break;
-    default:
-        fprintf(stderr, "Invalid option\n");
-        sqlite3_close(db);
-        return 1;
-    }
-
-    // main loop
     int running = 1;
     while (running)
     {
         // Ask user to choose the option
-        option = choose_account_data_option();
+        int option = choose_login_register_option();
+
+        switch (option)
+        {
+        case 1:
+            register_user(db);
+            break;
+        case 2:
+            login(db);
+            running = 0;
+            break;
+        default:
+            fprintf(stderr, "Invalid option\n");
+            break;
+        }
+    }
+
+    // Main loop
+    running = 1;
+    while (running)
+    {
+        // Ask user to choose the option
+        int option = choose_account_data_option();
 
         switch (option)
         {
