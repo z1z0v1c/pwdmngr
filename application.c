@@ -9,6 +9,7 @@
 
 #define MAX_LENGTH 30
 
+int isPasswordGenerated = 0;
 char *password = NULL;
 
 int choose_login_register_option(void)
@@ -75,6 +76,14 @@ int choose_password_option(void)
     }
 
     return option;
+}
+
+void free_password()
+{
+    if (isPasswordGenerated)
+    {
+        free(password);
+    }
 }
 
 // Generate password with letters, special chars, and nums
@@ -155,73 +164,12 @@ int generate_password()
         break;
     }
 
+    isPasswordGenerated = 1;
     printf("\n\t\tGenerated password: %s\n", password);
 
     free(length);
 
     return 0;
-}
-
-int login(sqlite3 *db)
-{
-    char *username = get_string("\n\tUsername: ", MAX_LENGTH);
-    char *password = get_string("\tMaster password: ", MAX_LENGTH);
-
-    // Validate input
-    if (strlen(username) == 0 || strlen(password) == 0)
-    {
-        fprintf(stderr, "Error: All fields are required\n");
-        return -1;
-    }
-
-    // Get password for the user from database
-    char *db_password = get_users_password(db, username);
-
-    // Compare passwords
-    if (strcmp(db_password, password) != 0)
-    {
-        printf("\nPassword are incorrect\n");
-        exit(1);
-    }
-
-    const int user_id = get_users_id(db, username);
-
-    // Convert the integer to a string and store the result in the str buffer
-    char user[3];
-    sprintf(user, "%d", user_id);
-
-    // Track session
-    setenv("SESSION_ID", user, 1);
-
-    printf("\n\t\tLogin successfull\n");
-
-    free_all(3, username, password, db_password);
-    return 0;
-}
-
-int register_user(sqlite3 *db)
-{
-    User *user = (User *)malloc(sizeof(User));
-
-    user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
-    user->last_name = get_string("\tLast name: ", MAX_LENGTH);
-    user->username = get_string("\tUsername: ", MAX_LENGTH);
-    user->password = get_string("\tMaster password: ", MAX_LENGTH);
-
-    // Validate input
-    if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
-        strlen(user->username) == 0 || strlen(user->password) == 0)
-    {
-        fprintf(stderr, "Error: All fields are required\n");
-        return -1;
-    }
-
-    int success = save_user(db, user);
-
-    // Free memory
-    free_user(user);
-
-    return success;
 }
 
 int add_account_data(sqlite3 *db)
@@ -256,6 +204,9 @@ int add_account_data(sqlite3 *db)
         {
             // Use generated password
             account->password = password;
+
+            // Password is used, new one is needed
+            isPasswordGenerated = 0;
         }
     }
     else
@@ -362,4 +313,66 @@ int list_all_accounts(sqlite3 *db)
 
     free(user_accounts);
     return 0;
+}
+
+int login(sqlite3 *db)
+{
+    char *username = get_string("\n\tUsername: ", MAX_LENGTH);
+    char *password = get_string("\tMaster password: ", MAX_LENGTH);
+
+    // Validate input
+    if (strlen(username) == 0 || strlen(password) == 0)
+    {
+        fprintf(stderr, "Error: All fields are required\n");
+        return -1;
+    }
+
+    // Get password for the user from database
+    char *db_password = get_users_password(db, username);
+
+    // Compare passwords
+    if (strcmp(db_password, password) != 0)
+    {
+        printf("\nPassword are incorrect\n");
+        exit(1);
+    }
+
+    const int user_id = get_users_id(db, username);
+
+    // Convert the integer to a string and store the result in the str buffer
+    char user[3];
+    sprintf(user, "%d", user_id);
+
+    // Track session
+    setenv("SESSION_ID", user, 1);
+
+    printf("\n\t\tLogin successfull\n");
+
+    free_all(3, username, password, db_password);
+    return 0;
+}
+
+int register_user(sqlite3 *db)
+{
+    User *user = (User *)malloc(sizeof(User));
+
+    user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
+    user->last_name = get_string("\tLast name: ", MAX_LENGTH);
+    user->username = get_string("\tUsername: ", MAX_LENGTH);
+    user->password = get_string("\tMaster password: ", MAX_LENGTH);
+
+    // Validate input
+    if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
+        strlen(user->username) == 0 || strlen(user->password) == 0)
+    {
+        fprintf(stderr, "Error: All fields are required\n");
+        return -1;
+    }
+
+    int success = save_user(db, user);
+
+    // Free memory
+    free_user(user);
+
+    return success;
 }

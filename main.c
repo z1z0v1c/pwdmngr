@@ -78,5 +78,6 @@ int main(void)
     }
 
     sqlite3_close(db);
+    free_password();
     return 0;
 }

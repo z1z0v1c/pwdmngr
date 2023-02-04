@@ -19,12 +19,13 @@ typedef struct
 
 int choose_login_register_option(void);
 int choose_account_data_option(void);
+void free_password();
 void generate_all(int length, char *password);
 void generate_letters_chars(int length, char *password);
 void generate_letters_numbers(int length, char *password);
-int login(sqlite3 *db);
-int register_user(sqlite3 *db);
 int add_account_data(sqlite3 *db);
 int delete_account(sqlite3 *db);
 int edit_account(sqlite3 *db);
 int list_all_accounts(sqlite3 *db);
+int login(sqlite3 *db);
+int register_user(sqlite3 *db);
