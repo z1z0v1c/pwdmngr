@@ -248,6 +248,12 @@ int edit_account(sqlite3 *db)
 
     Account *account = get_account_by_id(db, *id);
 
+    if (account == NULL)
+    {
+        free(id);
+        return 1;
+    }
+
     free(account->username);
     free(account->password);
 

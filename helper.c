@@ -70,7 +70,7 @@ int *get_int(char *tip)
         }
 
         free(num);
-        printf("\n\t\tError: invalid input. Please try again.\n");
+        printf("\n\t\tNot a number. Please try again.\n");
 
         // Flush the buffer
         int c;

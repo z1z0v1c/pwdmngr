@@ -35,7 +35,7 @@ Account *get_account_by_id(sqlite3 *db, int id)
     sqlite3_stmt *res = NULL;
 
     // Construct the SELECT query
-    rc = sqlite3_prepare_v2(db, "SELECT * FROM accounts WHERE id = ?", -1, &res, 0);
+    rc = sqlite3_prepare_v2(db, "SELECT * FROM accounts WHERE id = ? AND user_id = ?", -1, &res, 0);
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
@@ -44,6 +44,9 @@ Account *get_account_by_id(sqlite3 *db, int id)
     }
 
     sqlite3_bind_int(res, 1, id);
+
+    int user_id = atoi(getenv("SESSION_ID"));
+    sqlite3_bind_int(res, 2, user_id);
 
     if ((rc = sqlite3_step(res)) == SQLITE_ROW)
     {
@@ -57,12 +60,15 @@ Account *get_account_by_id(sqlite3 *db, int id)
         account->password = malloc(sqlite3_column_bytes(res, 4) + 1);
         strcpy(account->password, (char *)sqlite3_column_text(res, 4));
     }
-
-    // Check if no accounts were found
-    if (account == NULL)
+    else
     {
-        fprintf(stderr, "No accounts found for user ID %d\n", id);
+        fprintf(stderr, "\n\t\tNo accounts found for id: %d\n", id);
+
+        // Free memory
+        sqlite3_finalize(res);
         free(account);
+
+        return NULL;
     }
 
     // Free memory
@@ -281,7 +287,7 @@ int save_user(sqlite3 *db, User *user)
         sqlite3_free(insert_query);
 
         return 0;
-    } 
+    }
 }
 
 int update_account(sqlite3 *db, Account *account)
