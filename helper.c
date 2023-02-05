@@ -56,12 +56,26 @@ char *get_string(char *tip, int len)
     return str;
 }
 
-// Get a number from user
+// Get a number from the user
 int *get_int(char *tip)
 {
-    int *num = malloc(sizeof(int));
-    printf("%s", tip);
-    scanf("%d", num);
+    int *num;
+    while (1) {
+        num = (int *)malloc(sizeof(int));
+
+        printf("%s", tip);
+
+        if (scanf("%d", num) == 1) {
+            break;
+        }
+
+        free(num);
+        printf("\n\t\tError: invalid input. Please try again.\n");
+
+        // Flush the buffer
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+    }
 
     return num;
 }
