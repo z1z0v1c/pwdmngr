@@ -164,9 +164,12 @@ int generate_password()
         break;
     }
 
+    // Update password flag
     isPasswordGenerated = 1;
+
     printf("\n\t\tGenerated password: %s\n", password);
 
+    // Free memory
     free(length);
 
     return 0;
@@ -180,13 +183,6 @@ int add_account_data(sqlite3 *db)
     account->username = get_string("\tUsername: ", MAX_LENGTH);
 
     char *pass = get_string("\tPassword (enter * to use generated one): ", MAX_LENGTH);
-
-    // Validate input
-    if (strlen(account->site) == 0 || strlen(account->username) == 0 || strlen(pass) == 0)
-    {
-        fprintf(stderr, "Error: All fields are required\n");
-        return -1;
-    }
 
     if (strcmp(pass, "*") == 0)
     {
@@ -205,12 +201,13 @@ int add_account_data(sqlite3 *db)
             // Use generated password
             account->password = password;
 
-            // Password is used, new one is needed
+            // Password is used, new one is needed and no freeing is needed
             isPasswordGenerated = 0;
         }
     }
     else
     {
+        // Use users password
         account->password = pass;
     }
 
@@ -225,6 +222,7 @@ int add_account_data(sqlite3 *db)
         free(pass);
     }
 
+    // Free memory
     free_account(account);
 
     return 0;
@@ -237,7 +235,9 @@ int delete_account(sqlite3 *db)
 
     delete_account_by_id(db, *id);
 
+    // Free memory
     free(id);
+
     return 0;
 }
 
@@ -254,19 +254,12 @@ int edit_account(sqlite3 *db)
         return 1;
     }
 
+    // Free for new data
     free(account->username);
     free(account->password);
 
     account->username = get_string("\tUsername: ", MAX_LENGTH);
-
     char *pass = get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
-
-    // Validate input
-    if (strlen(account->username) == 0 || strlen(pass) == 0)
-    {
-        fprintf(stderr, "Error: All fields are required\n");
-        return -1;
-    }
 
     if (strcmp(pass, "*") == 0)
     {
@@ -287,6 +280,7 @@ int edit_account(sqlite3 *db)
 
     update_account(db, account);
 
+    // Free memory
     free_account(account);
     free(pass);
     free(id);
@@ -298,7 +292,10 @@ int list_all_accounts(sqlite3 *db)
 {
     int user_id = atoi(getenv("SESSION_ID"));
     int size;
+
     Account *user_accounts = get_all_accounts(db, user_id, &size);
+
+    // Finish if no accounts were found
     if (user_accounts == NULL)
     {
         return -1;
@@ -317,7 +314,9 @@ int list_all_accounts(sqlite3 *db)
 
     printf("%s", "\n");
 
+    // Free memory
     free(user_accounts);
+    
     return 0;
 }
 
@@ -326,14 +325,7 @@ int login(sqlite3 *db)
     char *username = get_string("\n\tUsername: ", MAX_LENGTH);
     char *password = get_string("\tMaster password: ", MAX_LENGTH);
 
-    // Validate input
-    if (strlen(username) == 0 || strlen(password) == 0)
-    {
-        fprintf(stderr, "Error: All fields are required\n");
-        return -1;
-    }
-
-    // Get password for the user from database
+    // Get users password from database
     char *db_password = get_users_password(db, username);
 
     // Compare passwords
@@ -354,7 +346,9 @@ int login(sqlite3 *db)
 
     printf("\n\t\tLogin successfull\n");
 
+    // Free memory
     free_all(3, username, password, db_password);
+    
     return 0;
 }
 
@@ -366,14 +360,6 @@ int register_user(sqlite3 *db)
     user->last_name = get_string("\tLast name: ", MAX_LENGTH);
     user->username = get_string("\tUsername: ", MAX_LENGTH);
     user->password = get_string("\tMaster password: ", MAX_LENGTH);
-
-    // Validate input
-    if (strlen(user->first_name) == 0 || strlen(user->last_name) == 0 ||
-        strlen(user->username) == 0 || strlen(user->password) == 0)
-    {
-        fprintf(stderr, "Error: All fields are required\n");
-        return -1;
-    }
 
     int success = save_user(db, user);
 
