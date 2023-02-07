@@ -54,6 +54,7 @@ int main(void)
         switch (option)
         {
         case 1:
+            free_password();
             generate_password();
             break;
         case 2:

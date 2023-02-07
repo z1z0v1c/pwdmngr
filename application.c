@@ -11,6 +11,8 @@
 
 int isPasswordGenerated = 0;
 char *password = NULL;
+char lowest = '!';
+char highest = '~';
 
 int choose_login_register_option(void)
 {
@@ -57,27 +59,6 @@ int choose_account_data_option(void)
     return option;
 }
 
-int choose_password_option(void)
-{
-    int option = 0;
-
-    while (option != 1 && option != 2 && option != 3)
-    {
-        printf("\n\t1. Letters and numbers \n");
-        printf("\t2. Letters and special characters \n");
-        printf("\t3. All \n");
-        printf("\n\tChoose an option : ");
-
-        scanf("%d", &option);
-
-        // Flush the buffer
-        char line[100];
-        fgets(line, sizeof(line), stdin);
-    }
-
-    return option;
-}
-
 void free_password()
 {
     if (isPasswordGenerated)
@@ -86,83 +67,71 @@ void free_password()
     }
 }
 
-// Generate password with letters, special chars, and nums
-void generate_all(int length, char *password)
-{
-    for (int i = 0; i < length; i++)
-    {
-        char character = (char)(rand() % (126 - 33 + 1) + 33);
-        password[i] = character;
-    }
-
-    password[length] = '\0';
-}
-
-// Generate password with letters and special chars
-void generate_letters_chars(int length, char *password)
-{
-    for (int i = 0; i < length; i++)
-    {
-        char character = (char)(rand() % (126 - 33 + 1) + 33);
-
-        // Escape non-valid chars
-        if (character > '/' && character < ':')
-        {
-            i--;
-            continue;
-        }
-
-        password[i] = character;
-    }
-
-    password[length] = '\0';
-}
-
-// Generate password with letters and nums
-void generate_letters_numbers(int length, char *password)
-{
-    for (int i = 0; i < length; i++)
-    {
-        char character = (char)(rand() % (122 - 48 + 1) + 48);
-
-        // Escape non-valid chars
-        if ((character > '9' && character < 'A') || (character > 'Z' && character < 'a'))
-        {
-            i--;
-            continue;
-        }
-
-        password[i] = character;
-    }
-
-    password[length] = '\0';
-}
-
 int generate_password()
 {
+    // Get users preferences
+    char *uppercase = get_string("\n\tDo you want to include uppercase letters? (y/n): ", 3);
+    char *lowercase = get_string("\tDo you want to include lowercase letters? (y/n): ", 3);
+    char *numbers= get_string("\tDo you want to include numbers? (y/n): ", 3);
+    char *special_chars = get_string("\tDo you want to include special characters? (y/n): ", 3);
+
+    // At least one char type need to be included
+    if (strcmp(uppercase, "n") == 0 && strcmp(lowercase, "n") == 0
+         && strcmp(numbers, "n") == 0 && strcmp(special_chars, "n") == 0)
+    {
+        printf("\n\t\tNo password generated. At least one character type is required\n");
+
+        // Free memory
+        free_all(4, uppercase, lowercase, numbers, special_chars);
+
+        return 1; 
+    }
+
     int *length = get_int("\n\tSpecify length: ");
 
+    // Allocate memory for password
     password = malloc(sizeof(char) * *length + 1);
     memset(password, 0, *length + 1);
 
-    int option = choose_password_option();
-
-    switch (option)
+    for (int i = 0; i < *length; i++)
     {
-    case 1:
-        generate_letters_numbers(*length, password);
-        break;
-    case 2:
-        generate_letters_chars(*length, password);
-        break;
-    case 3:
-        generate_all(*length, password);
-        break;
+        char character = (char)(rand() % (highest - lowest + 1) + lowest);
 
-    default:
-        *password = '\0';
-        break;
+        // Escape uppercase letters
+        if (strcmp(uppercase, "n") == 0 && (character >= 'A' && character <= 'Z')) 
+        {
+            i--;
+            continue;
+        }
+
+        // Escape lowercase letters
+        if (strcmp(lowercase, "n") == 0 && (character >= 'a' && character <= 'z')) 
+        {
+            i--;
+            continue;
+        }
+
+        // Escape numbers
+        if (strcmp(numbers, "n") == 0 && (character >= '0' && character <= '9')) 
+        {
+            i--;
+            continue;
+        }
+
+        // Escape special characters
+        if (strcmp(special_chars, "n") == 0 && 
+                ((character <= '/' || character >= '{') ||
+                 (character >= ':' && character <= '@') || 
+                 (character >= '[' && character <= '`'))) 
+        {
+            i--;
+            continue;
+        }
+
+        password[i] = character;
     }
+
+    password[*length] = '\0';
 
     // Update password flag
     isPasswordGenerated = 1;
@@ -170,7 +139,7 @@ int generate_password()
     printf("\n\t\tGenerated password: %s\n", password);
 
     // Free memory
-    free(length);
+    free_all(5, length, uppercase, lowercase, numbers, special_chars);
 
     return 0;
 }
