@@ -18,7 +18,7 @@ int main(void)
         return 1;
     }
 
-    printf("Choose options by specifying a number\n");
+    printf("\nCHOOSE OPTIONS BY SPECIFYING A NUMBER\n");
 
     int running = 1;
     while (running)
