@@ -72,19 +72,18 @@ int generate_password()
     // Get users preferences
     char *uppercase = get_string("\n\tDo you want to include uppercase letters? (y/n): ", 3);
     char *lowercase = get_string("\tDo you want to include lowercase letters? (y/n): ", 3);
-    char *numbers= get_string("\tDo you want to include numbers? (y/n): ", 3);
+    char *numbers = get_string("\tDo you want to include numbers? (y/n): ", 3);
     char *special_chars = get_string("\tDo you want to include special characters? (y/n): ", 3);
 
     // At least one char type need to be included
-    if (strcmp(uppercase, "n") == 0 && strcmp(lowercase, "n") == 0
-         && strcmp(numbers, "n") == 0 && strcmp(special_chars, "n") == 0)
+    if (strcmp(uppercase, "n") == 0 && strcmp(lowercase, "n") == 0 && strcmp(numbers, "n") == 0 && strcmp(special_chars, "n") == 0)
     {
         printf("\n\t\tNo password generated. At least one character type is required\n");
 
         // Free memory
         free_all(4, uppercase, lowercase, numbers, special_chars);
 
-        return 1; 
+        return 1;
     }
 
     int *length = get_int("\n\tSpecify length: ");
@@ -98,31 +97,31 @@ int generate_password()
         char character = (char)(rand() % (highest - lowest + 1) + lowest);
 
         // Escape uppercase letters
-        if (strcmp(uppercase, "n") == 0 && (character >= 'A' && character <= 'Z')) 
+        if (strcmp(uppercase, "n") == 0 && (character >= 'A' && character <= 'Z'))
         {
             i--;
             continue;
         }
 
         // Escape lowercase letters
-        if (strcmp(lowercase, "n") == 0 && (character >= 'a' && character <= 'z')) 
+        if (strcmp(lowercase, "n") == 0 && (character >= 'a' && character <= 'z'))
         {
             i--;
             continue;
         }
 
         // Escape numbers
-        if (strcmp(numbers, "n") == 0 && (character >= '0' && character <= '9')) 
+        if (strcmp(numbers, "n") == 0 && (character >= '0' && character <= '9'))
         {
             i--;
             continue;
         }
 
         // Escape special characters
-        if (strcmp(special_chars, "n") == 0 && 
-                ((character <= '/' || character >= '{') ||
-                 (character >= ':' && character <= '@') || 
-                 (character >= '[' && character <= '`'))) 
+        if (strcmp(special_chars, "n") == 0 &&
+            ((character <= '/' || character >= '{') ||
+             (character >= ':' && character <= '@') ||
+             (character >= '[' && character <= '`')))
         {
             i--;
             continue;
@@ -285,14 +284,14 @@ int list_all_accounts(sqlite3 *db)
 
     // Free memory
     free(user_accounts);
-    
+
     return 0;
 }
 
 int login(sqlite3 *db)
 {
     char *username = get_string("\n\tUsername: ", MAX_LENGTH);
-    char *password = get_string("\tMaster password: ", MAX_LENGTH);
+    char *password = get_password("\tMaster password: ", MAX_LENGTH);
 
     // Get users password from database
     char *db_password = get_users_password(db, username);
@@ -300,7 +299,7 @@ int login(sqlite3 *db)
     // Compare passwords
     if (strcmp(db_password, password) != 0)
     {
-        printf("\nPassword are incorrect\n");
+        printf("\n\n\t\tPassword are incorrect\n");
         exit(1);
     }
 
@@ -313,11 +312,11 @@ int login(sqlite3 *db)
     // Track session
     setenv("SESSION_ID", user, 1);
 
-    printf("\n\t\tLogin successfull\n");
+    printf("\n\n\t\tLogin successfull\n");
 
     // Free memory
     free_all(3, username, password, db_password);
-    
+
     return 0;
 }
 
