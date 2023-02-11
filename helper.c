@@ -152,6 +152,8 @@ char *get_password(char *tip, int len)
         }
     }
 
+    printf("%s", "\n");
+
     return password;
 }
 

@@ -299,7 +299,7 @@ int login(sqlite3 *db)
     // Compare passwords
     if (strcmp(db_password, password) != 0)
     {
-        printf("\n\n\t\tPassword are incorrect\n");
+        printf("\n\t\tPassword are incorrect\n");
         exit(1);
     }
 
@@ -312,7 +312,7 @@ int login(sqlite3 *db)
     // Track session
     setenv("SESSION_ID", user, 1);
 
-    printf("\n\n\t\tLogin successfull\n");
+    printf("\n\t\tLogin successfull\n");
 
     // Free memory
     free_all(3, username, password, db_password);
@@ -327,7 +327,7 @@ int register_user(sqlite3 *db)
     user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
     user->last_name = get_string("\tLast name: ", MAX_LENGTH);
     user->username = get_string("\tUsername: ", MAX_LENGTH);
-    user->password = get_string("\tMaster password: ", MAX_LENGTH);
+    user->password = get_password("\tMaster password: ", MAX_LENGTH);
 
     int success = save_user(db, user);
 
