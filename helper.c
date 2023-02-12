@@ -29,16 +29,6 @@ void free_all(int count, ...)
     va_end(args);
 }
 
-// Free memory for an user
-void free_user(User *user)
-{
-    free(user->first_name);
-    free(user->last_name);
-    free(user->username);
-    free(user->password);
-    free(user);
-}
-
 // Get single character from standard input
 char get_char()
 {

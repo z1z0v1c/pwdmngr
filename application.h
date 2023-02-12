@@ -1,13 +1,5 @@
 #include <sqlite3.h>
 
-typedef struct
-{
-    char *first_name;
-    char *last_name;
-    char *username;
-    char *password;
-} User;
-
 int choose_login_register_option(void);
 int choose_account_data_option(void);
 int generate_password();
