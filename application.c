@@ -1,3 +1,4 @@
+#include <openssl/evp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
@@ -296,8 +297,20 @@ int login(sqlite3 *db)
     // Get users password from database
     char *db_password = get_users_password(db, username);
 
-    // Compare passwords
+//Hash master passwords if openssl/env.h is installed 
+#ifdef OPENSSL_EVP_H
+    unsigned char *hash = malloc(EVP_MAX_MD_SIZE);
+    unsigned int length = 0;
+
+    hash_password(password, hash, &length);
+#endif
+
+// Compare passwords
+#ifdef OPENSSL_EVP_H
+    if (strcmp(db_password, (char*)hash) != 0)
+#else
     if (strcmp(db_password, password) != 0)
+#endif
     {
         printf("\n\t\tPassword are incorrect\n");
         exit(1);
@@ -327,11 +340,27 @@ int register_user(sqlite3 *db)
     user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
     user->last_name = get_string("\tLast name: ", MAX_LENGTH);
     user->username = get_string("\tUsername: ", MAX_LENGTH);
+
+//Hash master passwords if openssl/env.h is installed 
+#ifdef OPENSSL_EVP_H
+    char *password = get_password("\tMaster password: ", MAX_LENGTH);
+
+    unsigned char *hash = malloc(EVP_MAX_MD_SIZE);
+    unsigned int length = 0;
+
+    hash_password(password, hash, &length);
+
+    user->password = (char *)hash;
+#else
     user->password = get_password("\tMaster password: ", MAX_LENGTH);
+#endif
 
     int success = save_user(db, user);
 
-    // Free memory
+// Free memory
+#ifdef OPENSSL_EVP_H
+    free(password);
+#endif
     free_user(user);
 
     return success;

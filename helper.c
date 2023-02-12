@@ -1,3 +1,4 @@
+#include <openssl/evp.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -147,3 +148,28 @@ char *get_string(char *tip, int len)
 
     return str;
 }
+
+#ifdef OPENSSL_EVP_H
+void hash_password(const char *password, unsigned char *hash, unsigned int *length) {
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (mdctx == NULL) {
+        printf("%s\n", "mdctx == NULL");
+    }
+
+    const EVP_MD *md = EVP_sha256();
+
+    if (1 != EVP_DigestInit_ex(mdctx, md, NULL)) {
+        printf("%s\n", "EVP_DigestInit_ex error");
+    }
+
+    if (1 != EVP_DigestUpdate(mdctx, password, strlen(password))) {
+        printf("%s\n", "EVP_DigestUpdate error");
+    }
+
+    if (1 != EVP_DigestFinal_ex(mdctx, hash, length)) {
+        printf("%s\n", "EVP_DigestFinal_ex error");
+    }
+
+    EVP_MD_CTX_free(mdctx);
+}
+#endif
