@@ -4,7 +4,6 @@
 #include <string.h>
 #include "application.h"
 #include "database.h"
-#include "helper.h"
 
 int main(void)
 {

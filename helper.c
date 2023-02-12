@@ -39,15 +39,6 @@ void free_user(User *user)
     free(user);
 }
 
-// Free memory for an account
-void free_account(Account *account)
-{
-    free(account->site);
-    free(account->username);
-    free(account->password);
-    free(account);
-}
-
 // Get single character from standard input
 char get_char()
 {

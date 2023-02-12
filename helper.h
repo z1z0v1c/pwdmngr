@@ -1,3 +1,5 @@
+#include "account.h"
+
 void free_all(int count, ...);
 void free_user(User *user);
 void free_account(Account *account);

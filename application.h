@@ -8,15 +8,6 @@ typedef struct
     char *password;
 } User;
 
-typedef struct
-{
-    int id;
-    int user_id;
-    char *site;
-    char *username;
-    char *password;
-} Account;
-
 int choose_login_register_option(void);
 int choose_account_data_option(void);
 int generate_password();

@@ -1,4 +1,5 @@
 #include <sqlite3.h>
+#include "helper.h"
 
 int delete_account_by_id(sqlite3 *db, int id);
 Account *get_account_by_id(sqlite3 *db, int id);
