@@ -5,6 +5,7 @@
 #include <time.h>
 #include "application.h"
 #include "database.h"
+#include "helper.h"
 
 #define MAX_LENGTH 30
 

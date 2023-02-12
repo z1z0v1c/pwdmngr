@@ -1,3 +1,6 @@
+#ifndef HEADER_FILE_ACCOUNT_H
+#define HEADER_FILE_ACCOUNT_H
+
 typedef struct
 {
     int id;
@@ -9,3 +12,5 @@ typedef struct
 
 // Free memory for an account
 void free_account(Account *account);
+
+#endif
