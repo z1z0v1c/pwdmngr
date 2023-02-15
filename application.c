@@ -295,9 +295,9 @@ int login(sqlite3 *db)
     char *password = get_password("\tMaster password: ", MAX_LENGTH);
 
     // Get users password from database
-    char *db_password = get_users_password(db, username);
+    unsigned char *db_password = get_users_password(db, username);
 
-//Hash master passwords if openssl/env.h is installed 
+// Hash master passwords if openssl/env.h is installed
 #ifdef OPENSSL_EVP_H
     unsigned char *hash = malloc(EVP_MAX_MD_SIZE);
     unsigned int length = 0;
@@ -307,14 +307,18 @@ int login(sqlite3 *db)
 
 // Compare passwords
 #ifdef OPENSSL_EVP_H
-    if (strcmp(db_password, (char*)hash) != 0)
-#else
-    if (strcmp(db_password, password) != 0)
-#endif
+    if (memcmp(db_password, hash, strlen((char *)db_password)) != 0)
     {
         printf("\n\t\tPassword are incorrect\n");
         exit(1);
     }
+#else
+    if (strcmp(db_password, password) != 0)
+    {
+        printf("\n\t\tPassword are incorrect\n");
+        exit(1);
+    }
+#endif
 
     const int user_id = get_users_id(db, username);
 
@@ -328,7 +332,7 @@ int login(sqlite3 *db)
     printf("\n\t\tLogin successfull\n");
 
     // Free memory
-    free_all(3, username, password, db_password);
+    free_all(4, username, password, db_password, hash);
 
     return 0;
 }
@@ -341,7 +345,7 @@ int register_user(sqlite3 *db)
     user->last_name = get_string("\tLast name: ", MAX_LENGTH);
     user->username = get_string("\tUsername: ", MAX_LENGTH);
 
-//Hash master passwords if openssl/env.h is installed 
+// Hash master passwords if openssl/env.h is installed
 #ifdef OPENSSL_EVP_H
     char *password = get_password("\tMaster password: ", MAX_LENGTH);
 

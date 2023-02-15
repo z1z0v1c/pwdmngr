@@ -152,7 +152,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     return accounts;
 }
 
-char *get_users_password(sqlite3 *db, char *username)
+unsigned char *get_users_password(sqlite3 *db, char *username)
 {
     // Construct the SELECT query
     sqlite3_stmt *res;
@@ -178,11 +178,11 @@ char *get_users_password(sqlite3 *db, char *username)
     }
 
     // Get data
-    char *password = (char *)sqlite3_column_text(res, 0);
-    int password_length = strlen(password);
+    unsigned char *password = (unsigned char *)sqlite3_column_text(res, 0);
+    int password_length = strlen((char *)password);
 
-    char *result = (char *)malloc(password_length + 1);
-    strncpy(result, password, password_length);
+    unsigned char *result = (unsigned char *)malloc(password_length + 1);
+    memcpy(result, password, password_length);
     result[password_length] = '\0';
 
     // Free memory
