@@ -344,19 +344,18 @@ int register_user(sqlite3 *db)
     user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
     user->last_name = get_string("\tLast name: ", MAX_LENGTH);
     user->username = get_string("\tUsername: ", MAX_LENGTH);
+    char *password = get_password("\tMaster password: ", MAX_LENGTH);
 
 // Hash master passwords if openssl/env.h is installed
 #ifdef OPENSSL_EVP_H
-    char *password = get_password("\tMaster password: ", MAX_LENGTH);
-
-    unsigned char *hash = malloc(EVP_MAX_MD_SIZE);
+    unsigned char *hash = calloc(EVP_MAX_MD_SIZE + 1, sizeof(char));
     unsigned int length = 0;
 
     hash_password(password, hash, &length);
 
-    user->password = (char *)hash;
+    user->password = hash;
 #else
-    user->password = get_password("\tMaster password: ", MAX_LENGTH);
+    user->password = password;
 #endif
 
     int success = save_user(db, user);

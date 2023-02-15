@@ -6,7 +6,7 @@ typedef struct
     char *first_name;
     char *last_name;
     char *username;
-    char *password;
+    unsigned char *password;
 } User;
 
 // Free memory for an user

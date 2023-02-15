@@ -1,3 +1,4 @@
+#include <openssl/evp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -258,36 +259,47 @@ int save_account(sqlite3 *db, Account *account)
 
 int save_user(sqlite3 *db, User *user)
 {
-    // Construct the INSERT statement
-    char *insert_query = sqlite3_mprintf(
-        "INSERT INTO users (first_name, last_name, username, password) "
-        "VALUES ('%q', '%q', '%q', '%q');",
-        user->first_name, user->last_name, user->username, user->password);
+    sqlite3_stmt *stmt;
+    const char *sql = "INSERT INTO users (first_name, last_name, username, password) VALUES (?, ?, ?, ?)";
 
-    // Execute the INSERT statement
-    char *error_message = 0;
-    int rc = sqlite3_exec(db, insert_query, 0, 0, &error_message);
-
-    // Check success
-    if (rc != SQLITE_OK)
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
     {
-        printf("\n\t\tUsername %s already exists. Try again.\n", user->username);
+        sqlite3_bind_text(stmt, 1, user->first_name, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, user->last_name, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, user->username, -1, SQLITE_STATIC);
+#ifdef OPENSSL_EVP_H
+        sqlite3_bind_blob(stmt, 4, user->password, strlen((char *)user->password), SQLITE_STATIC);
+#else
+        sqlite3_bind_text(stmt, 3, user->password, -1, SQLITE_STATIC);
+#endif
 
-        // Free memory
-        sqlite3_free(error_message);
-        sqlite3_free(insert_query);
+        int result = sqlite3_step(stmt);
 
-        return -1;
+        // Handle error
+        if (result != SQLITE_DONE)
+        {
+            if (result == SQLITE_CONSTRAINT)
+            {
+                printf("\n\t\tUsername %s already exists. Try again.\n", user->username);
+            }
+            else
+            {
+                printf("\n\t\t%s\n", "Something went wrong.");
+            }
+
+            // Free memory
+            sqlite3_finalize(stmt);
+
+            return 1;
+        }
     }
-    else
-    {
-        printf("\n\t\tRegistered successfully\n");
 
-        // Free memory
-        sqlite3_free(insert_query);
+    printf("\n\t\tRegistered successfully\n");
 
-        return 0;
-    }
+    // Free memory
+    sqlite3_finalize(stmt);
+
+    return 0;
 }
 
 int update_account(sqlite3 *db, Account *account)
