@@ -173,9 +173,10 @@ unsigned char *get_users_password(sqlite3 *db, char *username)
 
     if (step != SQLITE_ROW)
     {
-        printf("\nUsername are incorrect\n");
+        // Free memory
         sqlite3_finalize(res);
-        exit(1);
+        
+        return NULL;
     }
 
     // Get data

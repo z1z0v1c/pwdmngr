@@ -31,8 +31,7 @@ int main(void)
             register_user(db);
             break;
         case 2:
-            login(db);
-            running = 0;
+            running = login(db);
             break;
         case 3:
             sqlite3_close(db);

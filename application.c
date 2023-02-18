@@ -348,6 +348,16 @@ int login(sqlite3 *db)
     // Get users password from database
     unsigned char *db_password = get_users_password(db, username);
 
+    if (db_password == NULL)
+    {
+        printf("\n\t\tIncorrect username\n");
+
+        // Free memory
+        free_all(3, username, password, db_password);
+
+        return 1;
+    }
+
 // Hash master passwords if openssl/env.h is installed
 #ifdef OPENSSL_EVP_H
     unsigned char *hash = malloc(EVP_MAX_MD_SIZE);
@@ -359,17 +369,17 @@ int login(sqlite3 *db)
 // Compare passwords
 #ifdef OPENSSL_EVP_H
     if (memcmp(db_password, hash, strlen((char *)db_password)) != 0)
-    {
-        printf("\n\t\tPassword are incorrect\n");
-        exit(1);
-    }
 #else
     if (strcmp(db_password, password) != 0)
-    {
-        printf("\n\t\tPassword are incorrect\n");
-        exit(1);
-    }
 #endif
+    {
+        printf("\n\t\tIncorrect password\n");
+
+        // Free memory
+        free_all(4, username, password, db_password, hash);
+
+        return 1;
+    }
 
     const int user_id = get_users_id(db, username);
 
