@@ -309,11 +309,11 @@ int list_all_accounts(sqlite3 *db)
 
     char *username_dashes = malloc(max_username_width + 1);
     memset(username_dashes, '-', max_username_width);
-    site_dashes[max_username_width] = '\0';
+    username_dashes[max_username_width] = '\0';
 
     char *password_dashes = malloc(max_password_width + 1);
     memset(password_dashes, '-', max_password_width);
-    site_dashes[max_password_width] = '\0';
+    password_dashes[max_password_width] = '\0';
 
     // Print the table with dynamically adjusted column widths
     printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+", max_id_width, id_dashes, max_site_width, site_dashes, max_username_width, username_dashes, max_password_width, password_dashes);
