@@ -8,7 +8,6 @@
 #include "application.h"
 #include "helper.h"
 
-// Free memory for all args 
 void free_all(int count, ...)
 {
     va_list args;
@@ -30,13 +29,14 @@ void free_all(int count, ...)
     va_end(args);
 }
 
-// Get single character from standard input
+// Get single character from standard input - private
 char get_char()
 {
+    // Declare and initialize variables
     char character = 0;
     struct termios old_attributes = {0};
 
-    // Get the terminal I/O attributes for the standard input 
+    // Get the terminal I/O attributes for the standard input
     if (tcgetattr(0, &old_attributes) < 0)
     {
         perror("Can't get terminal I/O attributes.");
@@ -75,20 +75,29 @@ char get_char()
     return character;
 }
 
-// Get a number from the user
-int *get_int(char *tip)
+int *get_int(char *message)
 {
     int *num;
-    while (1) {
+
+    // Loop until number is entered
+    while (1)
+    {
+        // Allocate memnory
         num = (int *)malloc(sizeof(int));
 
-        printf("%s", tip);
+        // Print message
+        printf("%s", message);
 
-        if (scanf("%d", num) == 1) {
+        // Scan the input and exit if a number is entered
+        if (scanf("%d", num) == 1)
+        {
             break;
         }
 
+        // Free memory
         free(num);
+
+        // Print an error message if number is not entered
         printf("\n\t\tNot a number. Please try again.\n");
 
         // Flush the buffer
@@ -99,24 +108,30 @@ int *get_int(char *tip)
     return num;
 }
 
-// Get password input from user
-char *get_password(char *tip, int len)
+char *get_password(char *message, int len)
 {
+    // Allocate memory
     char *password = malloc(len + 1);
     int i = 0;
 
-    printf("%s", tip);
+    // Print the message
+    printf("%s", message);
     fflush(stdout);
 
-    // Get characters while replacing them with asterisks
+    // Get characters and mask them with asterisks
     while (1)
     {
+        // Get single character
         char c = get_char();
+
+        // Exit if the user has pressed enter
         if (c == '\n' || c == '\r')
         {
             password[i] = 0;
             break;
         }
+
+        // User has pressed backspace or delete
         if (c == 127 || c == 8)
         {
             if (i > 0)
@@ -125,7 +140,7 @@ char *get_password(char *tip, int len)
                 i--;
             }
         }
-        else
+        else // Save the character and mask it with an asterisk
         {
             password[i] = c;
             i++;
@@ -134,42 +149,59 @@ char *get_password(char *tip, int len)
         }
     }
 
+    // Print new line
     printf("%s", "\n");
 
     return password;
 }
 
-// Get text input from user
-char *get_string(char *tip, int len)
+char *get_string(char *message, int len)
 {
+    // Allocate memory
     char *str = malloc(len + 1);
-    printf("%s", tip);
+
+    // Print the message
+    printf("%s", message);
+
+    // Scan the input
     scanf("%s", str);
 
     return str;
 }
 
+// Define hash function only if the openssl/env library is installed on the system
 #ifdef OPENSSL_EVP_H
-void hash_password(const char *password, unsigned char *hash, unsigned int *length) {
+void hash_password(const char *password, unsigned char *hash, unsigned int *length)
+{
+    // Create a new EVP_MD_CTX object
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
-    if (mdctx == NULL) {
+    if (mdctx == NULL)
+    {
         printf("%s\n", "mdctx == NULL");
     }
 
+    // Set the hashing algorithm
     const EVP_MD *md = EVP_sha256();
 
-    if (1 != EVP_DigestInit_ex(mdctx, md, NULL)) {
+    // Initialize the hash context
+    if (1 != EVP_DigestInit_ex(mdctx, md, NULL))
+    {
         printf("%s\n", "EVP_DigestInit_ex error");
     }
 
-    if (1 != EVP_DigestUpdate(mdctx, password, strlen(password))) {
+    // Add the password string to the hash context
+    if (1 != EVP_DigestUpdate(mdctx, password, strlen(password)))
+    {
         printf("%s\n", "EVP_DigestUpdate error");
     }
 
-    if (1 != EVP_DigestFinal_ex(mdctx, hash, length)) {
+    // Compute hash and store it in the "hash" buffer
+    if (1 != EVP_DigestFinal_ex(mdctx, hash, length))
+    {
         printf("%s\n", "EVP_DigestFinal_ex error");
     }
 
+    // Free memory
     EVP_MD_CTX_free(mdctx);
 }
 #endif
