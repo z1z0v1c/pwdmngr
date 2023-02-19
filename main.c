@@ -11,18 +11,22 @@ int main(void)
     sqlite3 *db;
     int rc = sqlite3_open("pwdmngr.db", &db);
 
+    // Exit if database can't be opened
     if (rc)
     {
         fprintf(stderr, "Error opening database: %s\n", sqlite3_errmsg(db));
         return 1;
     }
 
+    // Print initial message
     printf("\nCHOOSE OPTIONS BY SPECIFYING A NUMBER\n");
 
     int running = 1;
+
+    // Login loop
     while (running)
     {
-        // Ask user to choose the option
+        // Ask user to choose an option
         int option = choose_login_register_option();
 
         switch (option)
@@ -34,6 +38,7 @@ int main(void)
             running = login(db);
             break;
         case 3:
+            // Free memory
             sqlite3_close(db);
             return 0;
         default:
@@ -46,7 +51,7 @@ int main(void)
     running = 1;
     while (running)
     {
-        // Ask user to choose the option
+        // Ask user to choose an option
         int option = choose_account_data_option();
 
         switch (option)
@@ -76,7 +81,9 @@ int main(void)
         }
     }
 
+    // Free memory
     sqlite3_close(db);
     free_password();
+
     return 0;
 }
