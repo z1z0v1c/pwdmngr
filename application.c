@@ -15,51 +15,6 @@ char *password = NULL;
 char lowest = '!';
 char highest = '~';
 
-int choose_login_register_option(void)
-{
-    int option = 0;
-
-    while (option != 1 && option != 2 && option != 3)
-    {
-        printf("\n1. Register \n");
-        printf("2. Login \n");
-        printf("3. Exit \n");
-        printf("\nChoose an option: ");
-
-        scanf("%d", &option);
-
-        // Flush the buffer
-        char line[100];
-        fgets(line, sizeof(line), stdin);
-    }
-
-    return option;
-}
-
-int choose_account_data_option(void)
-{
-    int option = 0;
-
-    while (option != 1 && option != 2 && option != 3 && option != 4 && option != 5 && option != 6)
-    {
-        printf("\n1. Generate password \n");
-        printf("2. Add account\n");
-        printf("3. Edit account\n");
-        printf("4. Delete account\n");
-        printf("5. List all accounts\n");
-        printf("6. Exit\n");
-        printf("\nChoose an option : ");
-
-        scanf("%d", &option);
-
-        // Flush the buffer
-        char line[100];
-        fgets(line, sizeof(line), stdin);
-    }
-
-    return option;
-}
-
 void free_password()
 {
     if (isPasswordGenerated)
@@ -241,6 +196,9 @@ int edit_account(sqlite3 *db)
             // Use generated password
             account->password = password;
         }
+
+        // Free memory
+        free(pass);
     }
     else
     {
@@ -251,7 +209,6 @@ int edit_account(sqlite3 *db)
 
     // Free memory
     free_account(account);
-    free(pass);
     free(id);
 
     return 0;

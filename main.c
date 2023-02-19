@@ -4,6 +4,7 @@
 #include <string.h>
 #include "application.h"
 #include "database.h"
+#include "helper.h"
 
 int main(void)
 {
@@ -22,14 +23,26 @@ int main(void)
     printf("\nCHOOSE OPTIONS BY SPECIFYING A NUMBER\n");
 
     int running = 1;
+    int *option = NULL;
 
     // Login loop
     while (running)
     {
-        // Ask user to choose an option
-        int option = choose_login_register_option();
+        // Print options
+        printf("\n1. Register \n");
+        printf("2. Login \n");
+        printf("3. Exit \n");
 
-        switch (option)
+        // Free memory for the new iteration
+        if (option != NULL)
+        {
+            free(option);
+        }
+
+        // Get an option
+        option = get_int("\nChoose an option: "); 
+
+        switch (*option)
         {
         case 1:
             register_user(db);
@@ -38,23 +51,38 @@ int main(void)
             running = login(db);
             break;
         case 3:
-            // Free memory
             sqlite3_close(db);
             return 0;
         default:
-            fprintf(stderr, "Invalid option\n");
+            printf("\n\tInvalid option\n");
             break;
         }
     }
 
-    // Main loop
+    // Prepare for the main loop
     running = 1;
+
+    // Main loop
     while (running)
     {
-        // Ask user to choose an option
-        int option = choose_account_data_option();
+        // Print options
+        printf("\n1. Generate password \n");
+        printf("2. Add account\n");
+        printf("3. Edit account\n");
+        printf("4. Delete account\n");
+        printf("5. List all accounts\n");
+        printf("6. Exit\n");
 
-        switch (option)
+        // Free memory for the new iteration
+        if (option != NULL)
+        {
+            free(option);
+        }
+
+        // Get an option
+        option = get_int("\nChoose an option: "); 
+
+        switch (*option)
         {
         case 1:
             free_password();
@@ -76,7 +104,7 @@ int main(void)
             running = 0;
             break;
         default:
-            fprintf(stderr, "Invalid option\n");
+            printf("\n\tInvalid option\n");
             break;
         }
     }
@@ -84,6 +112,7 @@ int main(void)
     // Free memory
     sqlite3_close(db);
     free_password();
+    free(option);
 
     return 0;
 }
