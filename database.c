@@ -1,4 +1,7 @@
+#ifdef OPENSSL_EVP_H
 #include <openssl/evp.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

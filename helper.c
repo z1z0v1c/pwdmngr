@@ -1,4 +1,7 @@
+#ifdef OPENSSL_EVP_H
 #include <openssl/evp.h>
+#endif
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,7 +105,8 @@ int *get_int(char *message)
 
         // Flush the buffer
         int c;
-        while ((c = getchar()) != '\n' && c != EOF);
+        while ((c = getchar()) != '\n' && c != EOF)
+            ;
     }
 
     return num;

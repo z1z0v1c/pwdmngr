@@ -1,4 +1,7 @@
+#ifdef OPENSSL_EVP_H
 #include <openssl/evp.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
@@ -333,7 +336,10 @@ int login(sqlite3 *db)
         printf("\n\t\tIncorrect password\n");
 
         // Free memory
-        free_all(4, username, password, db_password, hash);
+#ifdef OPENSSL_EVP_H
+        free(hash);
+#endif
+        free_all(3, username, password, db_password);
 
         return 1;
     }
@@ -350,7 +356,10 @@ int login(sqlite3 *db)
     printf("\n\t\tLogin successfull\n");
 
     // Free memory
-    free_all(4, username, password, db_password, hash);
+#ifdef OPENSSL_EVP_H
+    free(hash);
+#endif
+    free_all(3, username, password, db_password);
 
     return 0;
 }
