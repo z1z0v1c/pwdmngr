@@ -3,8 +3,8 @@
 
 #include <sqlite3.h>
 
-int generate_password();
-void free_password();
+int generate_password(void);
+void free_password(void);
 int add_account_data(sqlite3 *db);
 int delete_account(sqlite3 *db);
 int edit_account(sqlite3 *db);

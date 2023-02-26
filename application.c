@@ -1,7 +1,3 @@
-#ifdef OPENSSL_EVP_H
-#include <openssl/evp.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
@@ -11,14 +7,18 @@
 #include "database.h"
 #include "helper.h"
 
+#ifdef OPENSSL_EVP_H
+#include <openssl/evp.h>
+#endif
+
 #define MAX_LENGTH 30
+#define LOWEST '!'
+#define HIGHEST '~'
 
 int isPasswordGenerated = 0;
 char *password = NULL;
-char lowest = '!';
-char highest = '~';
 
-void free_password()
+void free_password(void)
 {
     if (isPasswordGenerated)
     {
@@ -26,7 +26,7 @@ void free_password()
     }
 }
 
-int generate_password()
+int generate_password(void)
 {
     // Get users preferences
     char *uppercase = get_string("\n\tDo you want to include uppercase letters? (y/n): ", 3);
@@ -47,13 +47,14 @@ int generate_password()
 
     int *length = get_int("\n\tSpecify length: ");
 
-    // Allocate memory for password
+    // Allocate memory for a password
     password = malloc(sizeof(char) * *length + 1);
     memset(password, 0, *length + 1);
 
+    // Generate random numbers
     for (int i = 0; i < *length; i++)
     {
-        char character = (char)(rand() % (highest - lowest + 1) + lowest);
+        char character = (char)(rand() % (HIGHEST - LOWEST + 1) + LOWEST);
 
         // Escape uppercase letters
         if (strcmp(uppercase, "n") == 0 && (character >= 'A' && character <= 'Z'))
@@ -104,6 +105,7 @@ int generate_password()
 
 int add_account_data(sqlite3 *db)
 {
+    // Allocate memory for an account
     Account *account = (Account *)malloc(sizeof(Account));
 
     account->site = get_string("\n\tSite: ", MAX_LENGTH);
@@ -125,25 +127,25 @@ int add_account_data(sqlite3 *db)
         }
         else
         {
-            // Use generated password
+            // Use a generated password
             account->password = password;
 
-            // Password is used, new one is needed and no freeing is needed
+            // Password has been used, a new one and no freeing is needed
             isPasswordGenerated = 0;
         }
     }
     else
     {
-        // Use users password
+        // Use the user's password
         account->password = pass;
     }
 
-    // Get user's Id from session
+    // Get the user's Id from the session
     account->user_id = atoi(getenv("SESSION_ID"));
 
     save_account(db, account);
 
-    // It is already freed if it is assigned to an account
+    // It has been already freed if it is assigned to an account
     if (strcmp(pass, "*") == 0)
     {
         free(pass);
@@ -157,7 +159,7 @@ int add_account_data(sqlite3 *db)
 
 int delete_account(sqlite3 *db)
 {
-    // Get Id of account from user
+    // Get Id of the account from the user
     int *id = get_int("\n\tAccount id: ");
 
     delete_account_by_id(db, *id);
@@ -170,7 +172,7 @@ int delete_account(sqlite3 *db)
 
 int edit_account(sqlite3 *db)
 {
-    // Get Id of account from user
+    // Get Id of the account from the user
     int *id = get_int("\n\tAccount id: ");
 
     Account *account = get_account_by_id(db, *id);
@@ -205,6 +207,7 @@ int edit_account(sqlite3 *db)
     }
     else
     {
+        // Use the user's password
         account->password = pass;
     }
 
@@ -219,12 +222,13 @@ int edit_account(sqlite3 *db)
 
 int list_all_accounts(sqlite3 *db)
 {
+    // Get the user's Id from the session
     int user_id = atoi(getenv("SESSION_ID"));
     int size;
 
     Account *user_accounts = get_all_accounts(db, user_id, &size);
 
-    // Finish if no accounts were found
+    // Finish if no accounts have been found
     if (user_accounts == NULL)
     {
         return -1;
@@ -276,20 +280,32 @@ int list_all_accounts(sqlite3 *db)
     password_dashes[max_password_width] = '\0';
 
     // Print the table with dynamically adjusted column widths
-    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+", max_id_width, id_dashes, max_site_width, site_dashes, max_username_width, username_dashes, max_password_width, password_dashes);
-    printf("\n\t| %-2s | %-*s | %-*s | %-*s | %-*s |", "No", max_id_width, "Id", max_site_width, "Site", max_username_width, "Username", max_password_width, "Password");
-    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+", max_id_width, id_dashes, max_site_width, site_dashes, max_username_width, username_dashes, max_password_width, password_dashes);
+    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+", 
+            max_id_width, id_dashes, max_site_width, site_dashes, max_username_width,
+            username_dashes, max_password_width, password_dashes);
+
+    printf("\n\t| %-2s | %-*s | %-*s | %-*s | %-*s |",
+            "No", max_id_width, "Id", max_site_width, "Site", max_username_width, 
+            "Username", max_password_width, "Password");
+
+    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+",
+            max_id_width, id_dashes, max_site_width, site_dashes, max_username_width, 
+            username_dashes, max_password_width, password_dashes);
 
     for (int i = 0; i < size; i++)
     {
-        printf("\n\t| %-2d | %-*d | %-*s | %-*s | %-*s |", i + 1, max_id_width, user_accounts[i].id, max_site_width, user_accounts[i].site, max_username_width, user_accounts[i].username, max_password_width, user_accounts[i].password);
+        printf("\n\t| %-2d | %-*d | %-*s | %-*s | %-*s |", 
+                i + 1, max_id_width, user_accounts[i].id, max_site_width, user_accounts[i].site,
+                max_username_width, user_accounts[i].username, max_password_width, user_accounts[i].password);
 
         free(user_accounts[i].site);
         free(user_accounts[i].username);
         free(user_accounts[i].password);
     }
 
-    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+", max_id_width, id_dashes, max_site_width, site_dashes, max_username_width, username_dashes, max_password_width, password_dashes);
+    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+",
+            max_id_width, id_dashes, max_site_width, site_dashes, max_username_width,
+            username_dashes, max_password_width, password_dashes);
 
     printf("%s", "\n");
 
@@ -336,10 +352,10 @@ int login(sqlite3 *db)
         printf("\n\t\tIncorrect password\n");
 
         // Free memory
+        free_all(3, username, password, db_password);
 #ifdef OPENSSL_EVP_H
         free(hash);
 #endif
-        free_all(3, username, password, db_password);
 
         return 1;
     }
@@ -366,6 +382,7 @@ int login(sqlite3 *db)
 
 int register_user(sqlite3 *db)
 {
+    // Allocate memory for an user
     User *user = (User *)malloc(sizeof(User));
 
     user->first_name = get_string("\n\tFirst name: ", MAX_LENGTH);
