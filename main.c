@@ -52,6 +52,7 @@ int main(void)
             break;
         case 3:
             sqlite3_close(db);
+            free(option);
             return 0;
         default:
             printf("\n\tInvalid option\n");

@@ -1,12 +1,12 @@
-#ifdef OPENSSL_EVP_H
-#include <openssl/evp.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "application.h"
 #include "database.h"
+
+#ifdef OPENSSL_EVP_H
+#include <openssl/evp.h>
+#endif
 
 int delete_account_by_id(sqlite3 *db, int id)
 {
@@ -160,7 +160,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     // Check if no accounts were found
     if (count == 0)
     {
-        fprintf(stderr, "No accounts found for user ID %d\n", user_id);
+        fprintf(stderr, "\n\tNo accounts found for user with Id = %d\n", user_id);
 
         // Free memory
         free(accounts);
@@ -318,11 +318,11 @@ int save_user(sqlite3 *db, User *user)
     sqlite3_bind_text(stmt, 1, user->first_name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, user->last_name, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, user->username, -1, SQLITE_STATIC);
-#ifdef OPENSSL_EVP_H
+// #ifdef OPENSSL_EVP_H
     sqlite3_bind_blob(stmt, 4, user->password, strlen((char *)user->password), SQLITE_STATIC);
-#else
-    sqlite3_bind_text(stmt, 3, user->password, -1, SQLITE_STATIC);
-#endif
+// #else
+//     sqlite3_bind_text(stmt, 3, user->password, -1, SQLITE_STATIC);
+// #endif
 
     int result = sqlite3_step(stmt);
 

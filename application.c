@@ -346,7 +346,7 @@ int login(sqlite3 *db)
 #ifdef OPENSSL_EVP_H
     if (memcmp(db_password, hash, strlen((char *)db_password)) != 0)
 #else
-    if (strcmp(db_password, password) != 0)
+    if (strcmp((char *)db_password, password) != 0)
 #endif
     {
         printf("\n\t\tIncorrect password\n");
@@ -399,7 +399,7 @@ int register_user(sqlite3 *db)
 
     user->password = hash;
 #else
-    user->password = password;
+    user->password = (unsigned char *)password;
 #endif
 
     int success = save_user(db, user);
