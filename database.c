@@ -74,7 +74,7 @@ Account *get_account_by_id(sqlite3 *db, int id)
     }
     else
     {
-        fprintf(stderr, "\n\t\tNo accounts found for id: %d\n", id);
+        fprintf(stderr, "\n\t\tAccount with Id = %d hasn't been found.\n", id);
 
         // Free memory
         sqlite3_finalize(res);
@@ -160,7 +160,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     // Check if no accounts were found
     if (count == 0)
     {
-        fprintf(stderr, "\n\tNo accounts found for user with Id = %d\n", user_id);
+        fprintf(stderr, "\n\tNo accounts have been found\n");
 
         // Free memory
         free(accounts);
@@ -374,6 +374,8 @@ int update_account(sqlite3 *db, Account *account)
 
         return 1;
     }
+
+    printf("\n\t\tAccount updated successfully\n");
 
     // Free memory
     sqlite3_free(update_query);
