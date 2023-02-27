@@ -1,7 +1,3 @@
-#ifdef OPENSSL_EVP_H
-#include <openssl/evp.h>
-#endif
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +6,10 @@
 #include <unistd.h>
 #include "application.h"
 #include "helper.h"
+
+#ifdef OPENSSL_EVP_H
+#include <openssl/evp.h>
+#endif
 
 void free_all(int count, ...)
 {
@@ -209,3 +209,84 @@ void hash_password(const char *password, unsigned char *hash, unsigned int *leng
     EVP_MD_CTX_free(mdctx);
 }
 #endif
+
+void print_accounts(Account *user_accounts, int size)
+{
+    // Determine maximum column widths
+    int max_id_width = strlen("Id"), max_site_width = strlen("Site"), max_username_width = strlen("Username"), max_password_width = strlen("Password");
+    for (int i = 0; i < size; i++)
+    {
+        int id_width = snprintf(NULL, 0, "%d", user_accounts[i].id);
+        if (id_width > max_id_width)
+        {
+            max_id_width = id_width;
+        }
+
+        int site_width = strlen(user_accounts[i].site);
+        if (site_width > max_site_width)
+        {
+            max_site_width = site_width;
+        }
+
+        int username_width = strlen(user_accounts[i].username);
+        if (username_width > max_username_width)
+        {
+            max_username_width = username_width;
+        }
+
+        int password_width = strlen(user_accounts[i].password);
+        if (password_width > max_password_width)
+        {
+            max_password_width = password_width;
+        }
+    }
+
+    char *id_dashes = malloc(max_id_width + 1); // allocate memory for the character array, including space for the null terminator
+    memset(id_dashes, '-', max_id_width);       // initialize all the characters to the dash character
+    id_dashes[max_id_width] = '\0';             // add the null terminator to the end of the character array
+
+    char *site_dashes = malloc(max_site_width + 1);
+    memset(site_dashes, '-', max_site_width);
+    site_dashes[max_site_width] = '\0';
+
+    char *username_dashes = malloc(max_username_width + 1);
+    memset(username_dashes, '-', max_username_width);
+    username_dashes[max_username_width] = '\0';
+
+    char *password_dashes = malloc(max_password_width + 1);
+    memset(password_dashes, '-', max_password_width);
+    password_dashes[max_password_width] = '\0';
+
+    // Print the table with dynamically adjusted column widths
+    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+", 
+            max_id_width, id_dashes, max_site_width, site_dashes, max_username_width,
+            username_dashes, max_password_width, password_dashes);
+
+    printf("\n\t| %-2s | %-*s | %-*s | %-*s | %-*s |",
+            "No", max_id_width, "Id", max_site_width, "Site", max_username_width, 
+            "Username", max_password_width, "Password");
+
+    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+",
+            max_id_width, id_dashes, max_site_width, site_dashes, max_username_width, 
+            username_dashes, max_password_width, password_dashes);
+
+    for (int i = 0; i < size; i++)
+    {
+        printf("\n\t| %-2d | %-*d | %-*s | %-*s | %-*s |", 
+                i + 1, max_id_width, user_accounts[i].id, max_site_width, user_accounts[i].site,
+                max_username_width, user_accounts[i].username, max_password_width, user_accounts[i].password);
+
+        free(user_accounts[i].site);
+        free(user_accounts[i].username);
+        free(user_accounts[i].password);
+    }
+
+    printf("\n\t+----+-%*s-+-%*s-+-%*s-+-%*s-+",
+            max_id_width, id_dashes, max_site_width, site_dashes, max_username_width,
+            username_dashes, max_password_width, password_dashes);
+
+    printf("%s", "\n");
+
+    // Free memory
+    free_all(4, id_dashes, site_dashes, username_dashes, password_dashes);
+}
