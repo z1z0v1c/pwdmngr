@@ -1,3 +1,4 @@
+#include <openssl/evp.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,10 +7,6 @@
 #include <unistd.h>
 #include "application.h"
 #include "helper.h"
-
-#ifdef OPENSSL_EVP_H
-#include <openssl/evp.h>
-#endif
 
 void free_all(int count, ...)
 {
@@ -173,8 +170,6 @@ char *get_string(char *message, int len)
     return str;
 }
 
-// Define hash function only if the openssl/env library is installed on the system
-#ifdef OPENSSL_EVP_H
 void hash_password(const char *password, unsigned char *hash, unsigned int *length)
 {
     // Create a new EVP_MD_CTX object
@@ -208,7 +203,6 @@ void hash_password(const char *password, unsigned char *hash, unsigned int *leng
     // Free memory
     EVP_MD_CTX_free(mdctx);
 }
-#endif
 
 void print_accounts(Account *user_accounts, int size)
 {
