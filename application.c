@@ -30,13 +30,12 @@ int generate_password(void)
     char *numbers = get_string("\tDo you want to include numbers? (y/n): ", 3);
     char *special_chars = get_string("\tDo you want to include special characters? (y/n): ", 3);
 
-    // At least one char type has to be included
     if (strcmp(include_uppercase, "n") == 0 &&
         strcmp(include_lowercase, "n") == 0 &&
         strcmp(numbers, "n") == 0 &&
         strcmp(special_chars, "n") == 0)
     {
-        printf("\n\t\tNo password generated. At least one character type is required\n");
+        printf("\n\t\tNo password has been generated. At least one character type has to be included\n");
 
         free_all(4, include_uppercase, include_lowercase, numbers, special_chars);
 
@@ -48,7 +47,7 @@ int generate_password(void)
     generated_password = malloc(sizeof(char) * *length + 1);
     memset(generated_password, 0, *length + 1);
 
-    // Generate random numbers
+    // Generate random characters for the password
     for (int i = 0; i < *length; i++)
     {
         char character = (char)(rand() % (HIGHEST - LOWEST + 1) + LOWEST);
@@ -105,16 +104,16 @@ int add_account_data(sqlite3 *db)
     account->site = get_string("\n\tSite: ", MAX_LENGTH);
     account->username = get_string("\tUsername: ", MAX_LENGTH);
 
-    char *pass = get_string("\tPassword (enter * to use generated one): ", MAX_LENGTH);
+    char *entered_password = get_string("\tPassword (enter * to use generated one): ", MAX_LENGTH);
 
-    if (strcmp(pass, "*") == 0)
+    if (strcmp(entered_password, "*") == 0)
     {
         if (generated_password == NULL)
         {
             printf("\n\t\tNo password generated. Account is not saved");
 
             free_account(account);
-            free(pass);
+            free(entered_password);
 
             return 1;
         }
@@ -128,7 +127,7 @@ int add_account_data(sqlite3 *db)
     }
     else
     {
-        account->password = pass;
+        account->password = entered_password;
     }
 
     account->user_id = atoi(getenv("SESSION_ID"));
@@ -138,9 +137,9 @@ int add_account_data(sqlite3 *db)
     free_account(account);
 
     // The entered password has already been freed if it has been assigned to an account
-    if (strcmp(pass, "*") == 0)
+    if (strcmp(entered_password, "*") == 0)
     {
-        free(pass);
+        free(entered_password);
     }
 
     return 0;
@@ -174,9 +173,9 @@ int edit_account(sqlite3 *db)
     free(account->password);
 
     account->username = get_string("\tUsername: ", MAX_LENGTH);
-    char *pass = get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
+    char *entered_password = get_string("\tPassword (enter * to use generated): ", MAX_LENGTH);
 
-    if (strcmp(pass, "*") == 0)
+    if (strcmp(entered_password, "*") == 0)
     {
         if (generated_password == NULL)
         {
@@ -188,11 +187,11 @@ int edit_account(sqlite3 *db)
         }
 
         // The entered password is not needed
-        free(pass);
+        free(entered_password);
     }
     else
     {
-        account->password = pass;
+        account->password = entered_password;
     }
 
     update_account(db, account);

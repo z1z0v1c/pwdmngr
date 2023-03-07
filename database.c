@@ -7,56 +7,55 @@
 
 int delete_account_by_id(sqlite3 *db, int id)
 {
-    // Get users id from session
     int user_id = atoi(getenv("SESSION_ID"));
 
-    // Construct DELETE statement
-    char *delete_query = sqlite3_mprintf("DELETE FROM accounts WHERE user_id = %d and id = %d;", user_id, id);
+    // Construct the DELETE statement
+    char *delete_stmt = sqlite3_mprintf("DELETE FROM accounts WHERE user_id = %d and id = %d;", user_id, id);
 
-    // Execute DELETE statement
+    // Execute the DELETE statement
     char *error_message = 0;
-    int rc = sqlite3_exec(db, delete_query, 0, 0, &error_message);
+    int rc = sqlite3_exec(db, delete_stmt, 0, 0, &error_message);
+
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "SQL error: %s\n", error_message);
+
         sqlite3_free(error_message);
-        sqlite3_free(delete_query);
+        sqlite3_free(delete_stmt);
+
         return -1;
     }
 
-    // Free memory
-    sqlite3_free(delete_query);
+    sqlite3_free(delete_stmt);
 
     return 0;
 }
 
 Account *get_account_by_id(sqlite3 *db, int id)
 {
-    // Declare variables and allocate memory
     int rc;
     Account *account = malloc(sizeof(Account));
     sqlite3_stmt *res = NULL;
 
     // Construct the SELECT query
     rc = sqlite3_prepare_v2(db, "SELECT * FROM accounts WHERE id = ? AND user_id = ?", -1, &res, 0);
+
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
 
-        // Free memory
         free(account);
 
         return NULL;
     }
 
-    // Get users id from session
     int user_id = atoi(getenv("SESSION_ID"));
 
     // Bind parameters
     sqlite3_bind_int(res, 1, id);
     sqlite3_bind_int(res, 2, user_id);
 
-    // Check if statement has a result
+    // If the SELECT statement has a result
     if ((rc = sqlite3_step(res)) == SQLITE_ROW)
     {
         // Process the values in the row
@@ -73,14 +72,12 @@ Account *get_account_by_id(sqlite3 *db, int id)
     {
         fprintf(stderr, "\n\t\tAccount with Id = %d hasn't been found.\n", id);
 
-        // Free memory
         sqlite3_finalize(res);
         free(account);
 
         return NULL;
     }
 
-    // Free memory
     sqlite3_finalize(res);
 
     return account;
@@ -88,10 +85,9 @@ Account *get_account_by_id(sqlite3 *db, int id)
 
 Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
 {
-    // Set initial size for the account list
+    // Set initial size for the list of accounts 
     *size = 2;
     
-    // Declare variables and allocate memory
     int rc;
     int count = 0;
     Account *accounts = malloc(sizeof(Account) * *size);
@@ -109,7 +105,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     // Bind parameter
     sqlite3_bind_int(res, 1, user_id);
 
-    // Check if statement has results
+    // If the SELECT statement has results
     while ((rc = sqlite3_step(res)) == SQLITE_ROW)
     {
         // Reallocate the accounts array if needed
@@ -122,14 +118,13 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
             {
                 fprintf(stderr, "Error allocating memory for accounts\n");
 
-                // Free memory
                 sqlite3_finalize(res);
 
                 return NULL;
             }
         }
 
-        // Process the values in the current row
+        // Process the values in a row
         accounts[count].id = sqlite3_column_int(res, 0);
         accounts[count].user_id = sqlite3_column_int(res, 1);
         accounts[count].site = malloc(sqlite3_column_bytes(res, 2) + 1);
@@ -142,24 +137,20 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
         count++;
     }
 
-    // Check if error has occured
     if (rc != SQLITE_DONE)
     {
         fprintf(stderr, "Error stepping statement: %s\n", sqlite3_errmsg(db));
 
-        // Free memory
         free(accounts);
         sqlite3_finalize(res);
 
         return NULL;
     }
 
-    // Check if no accounts were found
     if (count == 0)
     {
         fprintf(stderr, "\n\tNo accounts have been found\n");
 
-        // Free memory
         free(accounts);
         accounts = NULL;
     }
@@ -172,7 +163,6 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
     // Set final size
     *size = count;
 
-    // Free memory
     sqlite3_finalize(res);
 
     return accounts;
@@ -184,12 +174,10 @@ unsigned char *get_users_password(sqlite3 *db, char *username)
     sqlite3_stmt *res;
     int rc = sqlite3_prepare_v2(db, "SELECT password FROM users WHERE username = ?", -1, &res, 0);
 
-    // Validate query
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
 
-        // Free memory
         sqlite3_finalize(res);
 
         return NULL;
@@ -198,25 +186,21 @@ unsigned char *get_users_password(sqlite3 *db, char *username)
     // Bind parameter
     sqlite3_bind_text(res, 1, username, -1, NULL);
 
-    // Check if no result was found
     if (sqlite3_step(res) != SQLITE_ROW)
     {
-        // Free memory
         sqlite3_finalize(res);
 
         return NULL;
     }
 
-    // Get password from the result
+    // Get the password from the result
     unsigned char *password = (unsigned char *)sqlite3_column_text(res, 0);
     int password_length = strlen((char *)password);
 
-    // Copy it to add null terminator
     unsigned char *final_password = (unsigned char *)malloc(password_length + 1);
     memcpy(final_password, password, password_length);
     final_password[password_length] = '\0';
 
-    // Free memory
     sqlite3_finalize(res);
 
     return final_password;
@@ -228,12 +212,10 @@ int get_users_id(sqlite3 *db, char *username)
     sqlite3_stmt *res;
     int rc = sqlite3_prepare_v2(db, "SELECT user_id FROM users WHERE username = ?", -1, &res, 0);
 
-    // Validate query
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
 
-        // Free memory
         sqlite3_finalize(res);
 
         return -1;
@@ -242,21 +224,18 @@ int get_users_id(sqlite3 *db, char *username)
     // Bind parameter
     sqlite3_bind_text(res, 1, username, -1, NULL);
 
-    // Check if no result was found
     if (sqlite3_step(res) != SQLITE_ROW)
     {
         printf("\nIncorrect username\n");
 
-        // Free memory
         sqlite3_finalize(res);
 
         return -1;
     }
 
-    // Get users id from the result
+    // Get the users id from the result
     int user_id = sqlite3_column_int(res, 0);
 
-    // Free memory
     sqlite3_finalize(res);
 
     return user_id;
@@ -274,12 +253,10 @@ int save_account(sqlite3 *db, Account *account)
     char *error_message = 0;
     int rc = sqlite3_exec(db, insert_stmt, 0, 0, &error_message);
 
-    // Check for errors
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "SQL error: %s\n", error_message);
 
-        // Free memory
         sqlite3_free(error_message);
         sqlite3_free(insert_stmt);
 
@@ -288,7 +265,6 @@ int save_account(sqlite3 *db, Account *account)
 
     printf("\n\t\tAccount saved successfully\n");
 
-    // Free memory
     sqlite3_free(insert_stmt);
 
     return 0;
@@ -296,16 +272,14 @@ int save_account(sqlite3 *db, Account *account)
 
 int save_user(sqlite3 *db, User *user)
 {
-    // Construct statement
+    // Construct the INSERT statement
     sqlite3_stmt *stmt;
     const char *sql = "INSERT INTO users (first_name, last_name, username, password) VALUES (?, ?, ?, ?)";
 
-    // Validate statement
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
     {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
 
-        // Free memory
         sqlite3_finalize(stmt);
 
         return -1;
@@ -319,7 +293,6 @@ int save_user(sqlite3 *db, User *user)
 
     int result = sqlite3_step(stmt);
 
-    // Handle error
     if (result != SQLITE_DONE)
     {
         if (result == SQLITE_CONSTRAINT)
@@ -331,7 +304,6 @@ int save_user(sqlite3 *db, User *user)
             printf("\n\t\t%s\n", "Something went wrong.");
         }
 
-        // Free memory
         sqlite3_finalize(stmt);
 
         return 1;
@@ -339,7 +311,6 @@ int save_user(sqlite3 *db, User *user)
 
     printf("\n\t\tRegistered successfully\n");
 
-    // Free memory
     sqlite3_finalize(stmt);
 
     return 0;
@@ -356,12 +327,10 @@ int update_account(sqlite3 *db, Account *account)
     char *error_message = 0;
     int rc = sqlite3_exec(db, update_query, 0, 0, &error_message);
 
-    // Handle error
     if (rc != SQLITE_OK)
     {
         fprintf(stderr, "SQL error: %s\n", error_message);
 
-        // Free memory
         sqlite3_free(error_message);
         sqlite3_free(update_query);
 
@@ -370,7 +339,6 @@ int update_account(sqlite3 *db, Account *account)
 
     printf("\n\t\tAccount updated successfully\n");
 
-    // Free memory
     sqlite3_free(update_query);
 
     return 0;
