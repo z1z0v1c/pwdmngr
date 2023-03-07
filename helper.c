@@ -8,35 +8,12 @@
 #include "application.h"
 #include "helper.h"
 
-void free_all(int count, ...)
+static char get_char()
 {
-    va_list args;
-
-    // Initialize the variable argument list
-    va_start(args, count);
-
-    // Iterate over the arguments and add them to the total
-    for (int i = 0; i < count; i++)
-    {
-        char *ptr = va_arg(args, char *);
-        if (ptr != NULL)
-        {
-            free(ptr);
-        }
-    }
-
-    // Clean up the variable argument list
-    va_end(args);
-}
-
-// Get single character from standard input - private
-char get_char()
-{
-    // Declare and initialize variables
     char character = 0;
     struct termios old_attributes = {0};
 
-    // Get the terminal I/O attributes for the standard input
+    // Get the current terminal I/O attributes
     if (tcgetattr(0, &old_attributes) < 0)
     {
         perror("Can't get terminal I/O attributes.");
@@ -64,7 +41,7 @@ char get_char()
     if (read(0, &character, 1) < 0)
         perror("Can't read a character.");
 
-    // Restore old attributes
+    // Restore the old attributes
     old_attributes.c_lflag |= ICANON;
     old_attributes.c_lflag |= ECHO;
     if (tcsetattr(0, TCSADRAIN, &old_attributes) < 0)
@@ -75,6 +52,27 @@ char get_char()
     return character;
 }
 
+void free_all(int count, ...)
+{
+    va_list args;
+
+    // Initialize the variable argument list
+    va_start(args, count);
+
+    // Iterate over the arguments and add them to the total
+    for (int i = 0; i < count; i++)
+    {
+        char *ptr = va_arg(args, char *);
+        if (ptr != NULL)
+        {
+            free(ptr);
+        }
+    }
+
+    // Clean up the variable argument list
+    va_end(args);
+}
+
 int *get_int(char *message)
 {
     int *num;
@@ -82,10 +80,8 @@ int *get_int(char *message)
     // Loop until number is entered
     while (1)
     {
-        // Allocate memnory
         num = (int *)malloc(sizeof(int));
 
-        // Print message
         printf("%s", message);
 
         // Scan the input and exit if a number is entered
@@ -94,13 +90,10 @@ int *get_int(char *message)
             break;
         }
 
-        // Free memory
         free(num);
 
-        // Print an error message if number is not entered
         printf("\n\t\tNot a number. Please try again.\n");
 
-        // Flush the buffer
         int c;
         while ((c = getchar()) != '\n' && c != EOF)
             ;
@@ -111,21 +104,18 @@ int *get_int(char *message)
 
 char *get_password(char *message, int len)
 {
-    // Allocate memory
     char *password = malloc(len + 1);
     int i = 0;
 
-    // Print the message
     printf("%s", message);
     fflush(stdout);
 
-    // Get characters and mask them with asterisks
     while (1)
     {
         // Get single character
         char c = get_char();
 
-        // Exit if the user has pressed enter
+        // Break the loop if the user has pressed enter
         if (c == '\n' || c == '\r')
         {
             password[i] = 0;
@@ -150,7 +140,6 @@ char *get_password(char *message, int len)
         }
     }
 
-    // Print new line
     printf("%s", "\n");
 
     return password;
@@ -158,13 +147,10 @@ char *get_password(char *message, int len)
 
 char *get_string(char *message, int len)
 {
-    // Allocate memory
     char *str = malloc(len + 1);
 
-    // Print the message
     printf("%s", message);
 
-    // Scan the input
     scanf("%s", str);
 
     return str;
@@ -206,8 +192,12 @@ void hash_password(const char *password, unsigned char *hash, unsigned int *leng
 
 void print_accounts(Account *user_accounts, int size)
 {
+    int max_id_width = strlen("Id");
+    int max_site_width = strlen("Site");
+    int max_username_width = strlen("Username");
+    int max_password_width = strlen("Password");
+
     // Determine maximum column widths
-    int max_id_width = strlen("Id"), max_site_width = strlen("Site"), max_username_width = strlen("Username"), max_password_width = strlen("Password");
     for (int i = 0; i < size; i++)
     {
         int id_width = snprintf(NULL, 0, "%d", user_accounts[i].id);
@@ -235,9 +225,10 @@ void print_accounts(Account *user_accounts, int size)
         }
     }
 
-    char *id_dashes = malloc(max_id_width + 1); // allocate memory for the character array, including space for the null terminator
-    memset(id_dashes, '-', max_id_width);       // initialize all the characters to the dash character
-    id_dashes[max_id_width] = '\0';             // add the null terminator to the end of the character array
+    // Allocate memory for the arrays and initialize all the characters with dashes
+    char *id_dashes = malloc(max_id_width + 1);
+    memset(id_dashes, '-', max_id_width);       
+    id_dashes[max_id_width] = '\0';
 
     char *site_dashes = malloc(max_site_width + 1);
     memset(site_dashes, '-', max_site_width);
@@ -281,6 +272,5 @@ void print_accounts(Account *user_accounts, int size)
 
     printf("%s", "\n");
 
-    // Free memory
     free_all(4, id_dashes, site_dashes, username_dashes, password_dashes);
 }
