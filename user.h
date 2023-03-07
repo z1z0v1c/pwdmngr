@@ -1,7 +1,6 @@
 #ifndef HEADER_FILE_USER_H
 #define HEADER_FILE_USER_H
 
-// Define the User struct
 typedef struct
 {
     char *first_name;

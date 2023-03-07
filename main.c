@@ -8,18 +8,15 @@
 
 int main(void)
 {
-    // Open database
     sqlite3 *db;
     int rc = sqlite3_open("pwdmngr.db", &db);
 
-    // Exit if database can't be opened
     if (rc)
     {
         fprintf(stderr, "Error opening database: %s\n", sqlite3_errmsg(db));
         return 1;
     }
 
-    // Print initial message
     printf("\nCHOOSE OPTIONS BY SPECIFYING A NUMBER\n");
 
     int running = 1;
@@ -28,18 +25,15 @@ int main(void)
     // Login loop
     while (running)
     {
-        // Print options
         printf("\n1. Register \n");
         printf("2. Login \n");
         printf("3. Exit \n");
 
-        // Free memory for the new iteration
         if (option != NULL)
         {
             free(option);
         }
 
-        // Get an option
         option = get_int("\nChoose an option: "); 
 
         switch (*option)
@@ -60,13 +54,11 @@ int main(void)
         }
     }
 
-    // Prepare for the main loop
     running = 1;
 
     // Main loop
     while (running)
     {
-        // Print options
         printf("\n1. Generate password \n");
         printf("2. Add account\n");
         printf("3. Edit account\n");
@@ -74,13 +66,11 @@ int main(void)
         printf("5. List all accounts\n");
         printf("6. Exit\n");
 
-        // Free memory for the new iteration
         if (option != NULL)
         {
             free(option);
         }
 
-        // Get an option
         option = get_int("\nChoose an option: "); 
 
         switch (*option)
@@ -110,7 +100,6 @@ int main(void)
         }
     }
 
-    // Free memory
     sqlite3_close(db);
     free_password();
     free(option);
