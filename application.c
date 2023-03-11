@@ -168,7 +168,7 @@ int edit_account(sqlite3 *db)
         return 1;
     }
 
-    // Free for new data
+    // Free for the new data
     free(account->username);
     free(account->password);
 
