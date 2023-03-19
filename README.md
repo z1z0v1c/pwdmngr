@@ -17,8 +17,8 @@ Provides options for:
 To generate a password, the user can choose several options:
 
       * Password length
-      * Type of characters (uppercase and lowercase letters, numbers and/or special characters) 
-        - at least one character type must be included
+      * Type of characters (uppercase and lowercase letters, numbers and/or special characters) -
+        at least one character type must be included
 
 Account is used to store information about user accounts across the web. Contains:
 
