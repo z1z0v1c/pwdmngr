@@ -116,7 +116,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
 
             if (accounts == NULL)
             {
-                fprintf(stderr, "Error allocating memory for accounts\n");
+                fprintf(stderr, "Error allocating memory for accounts.\n");
 
                 sqlite3_finalize(res);
 
@@ -149,7 +149,7 @@ Account *get_all_accounts(sqlite3 *db, int user_id, int *size)
 
     if (count == 0)
     {
-        fprintf(stderr, "\n\tNo accounts have been found\n");
+        fprintf(stderr, "\n\tNo accounts have been found.\n");
 
         free(accounts);
         accounts = NULL;
@@ -226,7 +226,7 @@ int get_users_id(sqlite3 *db, char *username)
 
     if (sqlite3_step(res) != SQLITE_ROW)
     {
-        printf("\nIncorrect username\n");
+        printf("\nIncorrect username!\n");
 
         sqlite3_finalize(res);
 
@@ -263,7 +263,7 @@ int save_account(sqlite3 *db, Account *account)
         return 1;
     }
 
-    printf("\n\t\tAccount saved successfully\n");
+    printf("\n\t\tAccount saved successfully!\n");
 
     sqlite3_free(insert_stmt);
 
@@ -297,7 +297,7 @@ int save_user(sqlite3 *db, User *user)
     {
         if (result == SQLITE_CONSTRAINT)
         {
-            printf("\n\t\tUsername %s already exists. Try again.\n", user->username);
+            printf("\n\t\tUsername %s already exists! Try again!\n", user->username);
         }
         else
         {
@@ -309,7 +309,7 @@ int save_user(sqlite3 *db, User *user)
         return 1;
     }
 
-    printf("\n\t\tRegistered successfully\n");
+    printf("\n\t\tRegistered successfully!\n");
 
     sqlite3_finalize(stmt);
 
@@ -337,7 +337,7 @@ int update_account(sqlite3 *db, Account *account)
         return 1;
     }
 
-    printf("\n\t\tAccount updated successfully\n");
+    printf("\n\t\tAccount updated successfully!\n");
 
     sqlite3_free(update_query);
 

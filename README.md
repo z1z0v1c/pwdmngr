@@ -17,31 +17,30 @@ Provides options for:
 To generate a password, the user can choose several options:
 
       * Password length
-      * Type of characters (uppercase and lowercase letters, numbers and/or special characters) -
-        at least one character type must be included
+      * Type of characters (uppercase and lowercase letters, numbers and/or special characters) - at least one character type must be included
 
 Account is used to store information about user accounts across the web. Contains:
 
       * Site name
-      * User name
+      * Username
       * Password
 
 ## Files
 
-That application includes the following source files and their corresponding header files:
+The application includes the following source files and their corresponding header files:
 
       * main - two loops used to select options
       * application - handling of selected options
       * database - database manipulation
       * helper - helper functions mainly for getting user input
-      * user - user data
-      * and account - account information
+      * user - user information
+      * account - account information
 
 It also includes a database.sql file for creating the database and a Makefile for compilation.
 
 ## Requirements and installation
 
-      * Install gcc and GNU Make if not already installed
+      * Install gcc and GNU Make if they are not already installed
       * Make sure openssl/evp.h is present on the system
       * Install sqlite3 and libsqlite3-dev and compile sqlite3.h
       * Run 'sqlite3 pwdmngr.db' -> run '.read database.sql'

@@ -35,7 +35,7 @@ int generate_password(void)
         strcmp(numbers, "n") == 0 &&
         strcmp(special_chars, "n") == 0)
     {
-        printf("\n\t\tNo password has been generated. At least one character type has to be included\n");
+        printf("\n\t\tPassword not generated! At least one character type has to be included!\n");
 
         free_all(4, include_uppercase, include_lowercase, numbers, special_chars);
 
@@ -108,12 +108,12 @@ int add_account_data(sqlite3 *db)
 
     if (strcmp(entered_password, "*") == 0)
     {
-        if (generated_password == NULL)
+        if (is_password_generated == 0)
         {
-            printf("\n\t\tNo password generated. Account is not saved");
+            printf("\n\t\tPassword not generated! Account not saved!\n");
 
-            free_account(account);
-            free(entered_password);
+            // Password not assigned, can't use free_account
+            free_all(4, account->site, account->username, account, entered_password);
 
             return 1;
         }
@@ -124,6 +124,9 @@ int add_account_data(sqlite3 *db)
             // The generated password has been used, a new one and no freeing is needed
             is_password_generated = 0;
         }
+
+        // The entered password is not needed
+        free(entered_password);
     }
     else
     {
@@ -135,12 +138,6 @@ int add_account_data(sqlite3 *db)
     save_account(db, account);
 
     free_account(account);
-
-    // The entered password has already been freed if it has been assigned to an account
-    if (strcmp(entered_password, "*") == 0)
-    {
-        free(entered_password);
-    }
 
     return 0;
 }
@@ -177,13 +174,16 @@ int edit_account(sqlite3 *db)
 
     if (strcmp(entered_password, "*") == 0)
     {
-        if (generated_password == NULL)
+        if (is_password_generated == 0)
         {
-            account->password = get_string("\tNo generated password. Enter another one: ", MAX_LENGTH);
+            account->password = get_string("\tPassword not generated! Enter another one: ", MAX_LENGTH);
         }
         else
         {
             account->password = generated_password;
+
+            // The generated password has been used, a new one and no freeing is needed
+            is_password_generated = 0;
         }
 
         // The entered password is not needed
@@ -230,7 +230,7 @@ int login(sqlite3 *db)
 
     if (password_from_db == NULL)
     {
-        printf("\n\t\tIncorrect username\n");
+        printf("\n\t\tIncorrect username!\n");
 
         free_all(3, username, master_password, password_from_db);
 
@@ -245,7 +245,7 @@ int login(sqlite3 *db)
     // Compare passwords
     if (memcmp(password_from_db, hash, strlen((char *)password_from_db)) != 0)
     {
-        printf("\n\t\tIncorrect master password\n");
+        printf("\n\t\tIncorrect master password!\n");
 
         free_all(4, username, master_password, password_from_db, hash);
 
@@ -261,7 +261,7 @@ int login(sqlite3 *db)
     // Track session
     setenv("SESSION_ID", user, 1);
 
-    printf("\n\t\tLogin successfull\n");
+    printf("\n\t\tLogin successfull!\n");
 
     free_all(4, username, master_password, password_from_db, hash);
 
