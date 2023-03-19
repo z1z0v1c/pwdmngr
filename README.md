@@ -1,4 +1,4 @@
-# PVDMNGR - Password manager
+# PWDMNGR - A password manager
 
 ## Video Demo: <URL HERE>
 
