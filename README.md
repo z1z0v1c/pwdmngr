@@ -1,6 +1,6 @@
 # PWDMNGR - Password manager
 
-## Video Demo: <URL HERE>
+## Video Demo: https://www.youtube.com/watch?v=rAAuTWFG1WA&ab_channel=AleksandarZizovic
 
 ## Description
 
