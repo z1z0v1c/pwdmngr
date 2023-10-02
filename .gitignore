@@ -12,8 +12,5 @@
 # Object files
 *.o
 
-# VS Code files
-.vscode/
-
 # SQLite database files
 *.db

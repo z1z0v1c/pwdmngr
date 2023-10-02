@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "sqlite3.h": "c",
+        "*.tcc": "c",
+        "application.h": "c",
+        "helper.h": "c",
+        "database.h": "c",
+        "stdio.h": "c",
+        "sha.h": "c",
+        "evp.h": "c",
+        "user.h": "c",
+        "time.h": "c",
+        "macros.h": "c",
+        "unistd.h": "c"
+    }
+}
