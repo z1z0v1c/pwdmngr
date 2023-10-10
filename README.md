@@ -1,7 +1,5 @@
 # PWDMNGR - Password manager
 
-## Video Demo: https://www.youtube.com/watch?v=rAAuTWFG1WA&ab_channel=AleksandarZizovic
-
 ## Description
 
 A simple password management tool written in the C programming language that uses an SQLite database to store data.
