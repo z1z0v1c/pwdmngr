@@ -1,4 +1,4 @@
-# PWDMNGR - Password manager
+# PWDMNGR - A password manager
 
 ## Description
 
