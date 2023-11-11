@@ -2,8 +2,8 @@
 
 ## Description
 
-A simple password management tool written in the C programming language that uses an SQLite database to store data.
-I decided to write it in C because I wanted to practice low-memory management to increase my skills.
+A simple password management tool written in the C programming language. Stores data in an SQLite database. Runs on Linux.
+Written for learning purposes.
 
 Requires user registration and login. If the user provides incorrect credentials for login it'll be notified which one is incorrect.
 
@@ -20,7 +20,8 @@ Memory management is also handled in this situation.
 To generate a password, the user can choose several options:
 
       * Password length
-      * Type of characters (uppercase and lowercase letters, numbers, and/or special characters) - at least one character type must be included
+      * Type of characters (uppercase and lowercase letters, numbers, and/or special characters)
+        - at least one character type must be included
 
 If the user tries to edit an unexisting account it will be notified.
 If the user tries to delete an unexisting account it will fail silently.
@@ -37,7 +38,8 @@ After the application is started, valgrind-out.txt will be created, and after cl
 
 The application includes the following source files and their corresponding header files:
 
-      * main.c - contains the main function that handles database connection and provides option selection for register/login and account manipulation.
+      * main.c - contains the main function that handles database connection,
+        and provides option selection for register/login and account manipulation.
       * application.c and application.h - contain functions for handling selected options
       * database.c and database.h - contain functions for the database manipulation
       * helper.c and helper.h - contain helper functions for getting user input, freeing memory, and hashing a password
@@ -52,3 +54,5 @@ It also includes the database.sql file for creating the database and the Makefil
       * Make sure openssl/evp.h is present on the system
       * Install sqlite3 and libsqlite3-dev and compile sqlite3.h
       * Run 'sqlite3 pwdmngr.db' -> run '.read database.sql'
+      * For checking memory leaks and errors run:
+           valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./main -lsqlite3
