@@ -3,8 +3,9 @@
 ## Description
 
 A simple password management tool written in the C programming language that uses an SQLite database to store data.
+I decided to write it in C because I wanted to practice low-memory management to increase my skills.
 
-Requires user registration and login.
+Requires user registration and login. If the user provides incorrect credentials for login it'll be notified which one is incorrect.
 
 Provides options for:
 
@@ -12,27 +13,36 @@ Provides options for:
       * Save, edit, delete accounts
       * List of all user accounts
 
+User can choose whether he wants to use a generated password for creating and editing an account or to provide one.
+If the user tries to use a generated password that hasn't been generated yet, it will be notified and the changes won't be saved.
+Memory management is also handled in this situation.
+
 To generate a password, the user can choose several options:
 
       * Password length
-      * Type of characters (uppercase and lowercase letters, numbers and/or special characters) - at least one character type must be included
+      * Type of characters (uppercase and lowercase letters, numbers, and/or special characters) - at least one character type must be included
 
-Account is used to store information about user accounts across the web. Contains:
+If the user tries to edit an unexisting account it will be notified.
+If the user tries to delete an unexisting account it will fail silently.
+
+An account is used to store information about user accounts across the web. Contains:
 
       * Site name
       * Username
       * Password
 
+After the application is started, valgrind-out.txt will be created, and after closing the application the memory information will be available.
+
 ## Files
 
 The application includes the following source files and their corresponding header files:
 
-      * main.c - contains main method that provides option selection
-      * application.c - handles selected options
-      * database.c - database manipulation
-      * helper.c - helper functions mainly for getting user input
-      * user.c - user information
-      * account.c - account information
+      * main.c - contains the main function that handles database connection and provides option selection for register/login and account manipulation.
+      * application.c and application.h - contain functions for handling selected options
+      * database.c and database.h - contain functions for the database manipulation
+      * helper.c and helper.h - contain helper functions for getting user input, freeing memory, and hashing a password
+      * user.c and user.h - contains user information data
+      * account.c and account.c - account information
 
 It also includes the database.sql file for creating the database and the Makefile for compilation.
 
