@@ -1,58 +1,76 @@
-# PWDMNGR - A password manager
+# pwdmngr
 
-## Description
+A simple password management tool written in **C** that uses **SQLite** for data storage. Developed for **Linux** systems as a learning project.
 
-A simple password management tool written in the C programming language. Stores data in an SQLite database. Runs on Linux.
-Written for learning purposes.
+## Features
 
-Requires user registration and login. If the user provides incorrect credentials for login it'll be notified which one is incorrect.
+- User registration and login system with credential validation
+- Password generation with customizable options:
+  - Configurable password length
+  - Character type selection
+- Account management:
+  - Save new accounts
+  - Edit existing accounts
+  - Delete accounts
+  - List all stored accounts
+- Option to use generated passwords or custom ones
+- Memory leak detection through Valgrind integration
 
-Provides options for:
+## Project Structure
 
-      * Password generation
-      * Save, edit, delete accounts
-      * List of all user accounts
+The application includes the following files:
 
-User can choose whether he wants to use a generated password for creating and editing an account or to provide one.
-If the user tries to use a generated password that hasn't been generated yet, it will be notified and the changes won't be saved.
-Memory management is also handled in this situation.
+| Source Files | Header Files | Description |
+|--------------|--------------|-------------|
+| main.c       | -            | Main program entry point, handles database connection and option selection |
+| application.c | application.h | Functions for handling user-selected options |
+| database.c   | database.h   | Database manipulation functions |
+| helper.c     | helper.h     | Utility functions for user input, memory management, and password hashing |
+| user.c       | user.h       | User information data structure and operations |
+| account.c    | account.h    | Account information data structure and operations |
 
-To generate a password, the user can choose several options:
+Additional files:
+- `database.sql`: SQL schema for database creation
+- `Makefile`: Builds the project
 
-      * Password length
-      * Type of characters (uppercase and lowercase letters, numbers, and/or special characters)
-        - at least one character type must be included
+## Error Handling
 
-If the user tries to edit an unexisting account it will be notified.
-If the user tries to delete an unexisting account it will fail silently.
+- Provides clear notifications for login errors, specifying which credential is incorrect
+- Attempting to use an ungenerated password will notify the user and cancel changes
+- Trying to edit a non-existent account will show a warning
+- Deleting a non-existent account fails silently
+- Memory is managed properly in all edge cases
 
-An account is used to store information about user accounts across the web. Contains:
+## Requirements & Installation
 
-      * Site name
-      * Username
-      * Password
+1. Install required dependencies:
+   - `gcc`, `make`
+   - `openssl` (check for `openssl/evp.h`)
+   - `sqlite3`, `libsqlite3-dev`
 
-After the application is started, valgrind-out.txt will be created, and after closing the application the memory information will be available.
+2. Initialize the database:
 
-## Files
+   ```bash
+   sqlite3 pwdmngr.db < database.sql
+   ```
+   
+   Alternatively:
+   ```bash
+   sqlite3 pwdmngr.db
+   .read database.sql
+   .exit
+   ```
 
-The application includes the following source files and their corresponding header files:
+3. Build and run the application:
 
-      * main.c - contains the main function that handles database connection,
-        and provides option selection for register/login and account manipulation.
-      * application.c and application.h - contain functions for handling selected options
-      * database.c and database.h - contain functions for the database manipulation
-      * helper.c and helper.h - contain helper functions for getting user input, freeing memory, and hashing a password
-      * user.c and user.h - contains user information data
-      * account.c and account.c - account information
+   ```bash
+   make
+   ./main
+   ```
 
-It also includes the database.sql file for creating the database and the Makefile for compilation.
-
-## Requirements and installation
-
-      * Install gcc and GNU Make if not already installed
-      * Make sure openssl/evp.h is present on the system
-      * Install sqlite3 and libsqlite3-dev and compile sqlite3.h
-      * Run 'sqlite3 pwdmngr.db' -> run '.read database.sql'
-      * For checking memory leaks and errors run:
-           valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./main -lsqlite3
+4. (Optional) Run with Valgrind for memory leak detection:
+   ```bash
+   valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.txt ./main -lsqlite3
+   ```
+   
+   Results will be available in `valgrind.txt` after exiting the application.
