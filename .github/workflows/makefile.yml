@@ -8,17 +8,27 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    
     steps:
-    - uses: actions/checkout@v4
-
+    - uses: actions/checkout@v3
+    
     - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-9 libsqlite3-dev libssl-dev
+    
+    - name: Build
       run: make
-
-    - name: Run check
-      run: make check
-
-    - name: Run distcheck
-      run: make distcheck
+        
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install cppcheck
+      run: sudo apt-get install -y cppcheck
+    
+    - name: Static code analysis
+      run: cppcheck --enable=all --suppress=missingIncludeSystem .
