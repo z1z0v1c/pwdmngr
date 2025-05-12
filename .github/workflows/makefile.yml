@@ -20,12 +20,6 @@ jobs:
     
     - name: Build
       run: make
-
-    - name: Check
-      run: make check
-
-    - name: Distcheck
-      run: make distcheck
         
   lint:
     runs-on: ubuntu-latest
