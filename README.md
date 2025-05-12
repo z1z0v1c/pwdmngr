@@ -1,6 +1,14 @@
 # pwdmngr
 
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/z1z0v1c/pwdmngr/makefile.yml?branch=main)
+![Valgrind](https://img.shields.io/badge/valgrind-%20checked-success)
+![Last Commit](https://img.shields.io/github/last-commit/z1z0v1c/pwdmngr)
+
 A simple password management tool written in **C** that uses **SQLite** for data storage. Developed for **Linux** systems as a learning project.
+
+[![C](https://img.shields.io/badge/language-C-darkgrey.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![SQLite](https://img.shields.io/badge/database-SQLite-blue.svg)](https://www.sqlite.org/)
+[![Linux](https://img.shields.io/badge/platform-Linux-red.svg)](https://www.linux.org/)
 
 ## Features
 
